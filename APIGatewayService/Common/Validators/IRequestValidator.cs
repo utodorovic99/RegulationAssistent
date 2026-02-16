@@ -1,0 +1,19 @@
+using APIGatewayService.Context.Common.Request;
+
+namespace APIGatewayService.Context.Common
+{
+	/// <summary>
+	/// Interface for validating request objects.
+	/// </summary>
+	internal interface IRequestValidator<T>
+		where T : IDeserializedRequest
+	{
+		/// <summary>
+		/// Validates the request.
+		/// Returns true when valid; otherwise returns false and sets <paramref name="error"/> to an error code.
+		/// </summary>
+		/// <param name="req">Deserialized request.</param>
+		/// <param name="error">Error code when validation fails.</param>
+		bool TryValidateRequest(IDeserializedRequest? req, out string error);
+	}
+}
