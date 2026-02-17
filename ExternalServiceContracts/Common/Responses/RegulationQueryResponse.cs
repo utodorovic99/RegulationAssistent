@@ -1,12 +1,15 @@
-﻿using APIGatewayService.Context.Common.Request;
+﻿using CommonSDK;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Text.Json.Serialization;
 
-namespace APIGatewayService.Context.Regulation
+namespace ExternalServiceContracts.Common
 {
 	/// <summary>
 	/// Represents the response to a regulation query, including a short answer, an explanation, relevant document citations, and a confidence score indicating the reliability of the answer.
 	/// </summary>
-	public sealed class RegulationQueryResponse : IDeserializedResponse
+	public sealed class RegulationQueryResponse : ISerializableResponse, IOptimizedStringOperations
 	{
 		/// <summary>
 		/// Gets a concise answer to the regulation query. This should provide a brief and direct response to the question asked, summarizing the key information derived from the relevant regulations.
@@ -31,5 +34,30 @@ namespace APIGatewayService.Context.Regulation
 		/// </summary>
 		[JsonPropertyName("confidence")]
 		public float Confidence { get; init; } = 0.0f;
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			AppendSelfAsString(sb);
+
+			return sb.ToString();
+		}
+
+		/// <inheritdoc/>
+		public void AppendSelfAsString(StringBuilder sb)
+		{
+			sb.AppendLine($"Short Answer: {ShortAnswer}");
+			sb.AppendLine($"Explanation: {Explanation}");
+			sb.AppendLine($"Citations:");
+
+			foreach (var citation in Citations)
+			{
+				citation.AppendSelfAsString(sb);
+				sb.AppendLine();
+			}
+
+			sb.AppendLine($"Confidence: {Confidence}");
+		}
 	}
 }

@@ -28,7 +28,7 @@
 	  <!-- This endpoint is used by the communication listener to obtain the port on which to
 				 listen. Ensure your listener uses the same endpoint Name ("ServiceEndpoint"). -->
 	  <!-- Set Protocol="http" and a fixed port for local testing. Change Port as required for your environment. -->
-	  <Endpoint Name="ServiceEndpoint" Protocol="http" Port="8080" />
+	  <Endpoint Name="ServiceEndpoint" Protocol="http" Port="8080" Type="Input" />
 	</Endpoints>
   </Resources>
 </ServiceManifest>

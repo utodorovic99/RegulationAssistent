@@ -1,4 +1,4 @@
-namespace APIGatewayService.Context.Common
+namespace ExternalServiceContracts.Common
 {
 	/// <summary>
 	/// Preferred answer presentation styles for regulation query responses.

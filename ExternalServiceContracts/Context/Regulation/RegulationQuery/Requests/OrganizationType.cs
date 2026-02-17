@@ -1,4 +1,4 @@
-﻿namespace APIGatewayService.Context.RegulationQuery
+namespace ExternalServiceContracts.Requests
 {
 	/// <summary>
 	/// Defines known organization categories used when evaluating regulation queries.

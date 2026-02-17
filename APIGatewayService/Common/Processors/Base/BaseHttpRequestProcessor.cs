@@ -1,6 +1,6 @@
 ﻿using APIGatewayService.Context.Common;
-using APIGatewayService.Context.Common.Request;
-using APIGatewayService.Context.RegulationQuery;
+using CommonSDK;
+using ExternalServiceContracts.Requests;
 using System.Fabric;
 using System.Net;
 using System.Text;
@@ -16,8 +16,8 @@ namespace APIGatewayService.Common
 	/// context for logging and configuration purposes.
 	/// </summary>
 	internal abstract class BaseHttpRequestProcessor<TDeserializedRequest, TDeserializedResponse> : IRequestProcessor<HttpProcessObject, HttpProcessResult>
-		where TDeserializedRequest : IDeserializedRequest
-		where TDeserializedResponse : IDeserializedResponse
+		where TDeserializedRequest : ISerializableRequest
+		where TDeserializedResponse : ISerializableResponse
 	{
 		private readonly string processorName;
 		private readonly IRequestValidator<RegulationQueryRequest> requestValidator;

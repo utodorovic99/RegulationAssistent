@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+ <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+ <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+ <xsd:element name="root" msdata:IsDataSet="true">
+ <xsd:complexType>
+ <xsd:choice maxOccurs="unbounded">
+ <xsd:element name="data">
+ <xsd:complexType>
+ <xsd:sequence>
+ <xsd:element name="value" type="xsd:string" minOccurs="0" />
+ <xsd:element name="comment" type="xsd:string" minOccurs="0" />
+ </xsd:sequence>
+ <xsd:attribute name="name" type="xsd:string" use="required" />
+ <xsd:attribute ref="xml:space" />
+ </xsd:complexType>
+ </xsd:element>
+ <xsd:element name="resheader">
+ <xsd:complexType>
+ <xsd:sequence>
+ <xsd:element name="value" type="xsd:string" minOccurs="0" />
+ </xsd:sequence>
+ <xsd:attribute name="name" type="xsd:string" use="required" />
+ </xsd:complexType>
+ </xsd:element>
+ </xsd:choice>
+ </xsd:complexType>
+ </xsd:element>
+ </xsd:schema>
+ <resheader name="resmimetype">
+ <value>text/microsoft-resx</value>
+ </resheader>
+ <resheader name="version">
+ <value>2.0</value>
+ </resheader>
+ <resheader name="reader">
+ <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+ </resheader>
+ <resheader name="writer">
+ <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+ </resheader>
+ <data name="WelcomeMessage" xml:space="preserve">
+ <value>Welcome to the Regulation Assistant! How can I help you?</value>
+ </data>
+ <data name="SendButton" xml:space="preserve">
+ <value>Send</value>
+ </data>
+ <data name="ClearButton" xml:space="preserve">
+ <value>Clear Chat</value>
+ </data>
+ <data name="DateLabel" xml:space="preserve">
+ <value>Date:</value>
+ </data>
+ <data name="OrganizationLabel" xml:space="preserve">
+ <value>Organization:</value>
+ </data>
+ <data name="OptionsHeader" xml:space="preserve">
+ <value>Options</value>
+ </data>
+ <data name="LanguageLabel" xml:space="preserve">
+ <value>Language:</value>
+ </data>
+ <data name="AnswerStyleLabel" xml:space="preserve">
+ <value>Answer Style:</value>
+ </data>
+ <data name="AnswerStyle_Concise" xml:space="preserve">
+ <value>Concise with Citations</value>
+ </data>
+ <data name="AnswerStyle_Detailed" xml:space="preserve">
+ <value>Detailed</value>
+ </data>
+ <data name="AnswerStyle_BulletPoints" xml:space="preserve">
+ <value>Bullet Points</value>
+ </data>
+ <data name="LanguageOption_English" xml:space="preserve">
+ <value>English</value>
+ </data>
+ <data name="LanguageOption_Serbian" xml:space="preserve">
+ <value>Serbian</value>
+ </data>
+ <!-- Organization type localization keys -->
+ <data name="OrganizationType_Company" xml:space="preserve">
+ <value>Company</value>
+ </data>
+ <data name="OrganizationType_Government" xml:space="preserve">
+ <value>Government</value>
+ </data>
+ <data name="OrganizationType_NonProfit" xml:space="preserve">
+ <value>Non-Profit</value>
+ </data>
+ <data name="OrganizationType_Educational" xml:space="preserve">
+ <value>Educational</value>
+ </data>
+ <data name="OrganizationType_Healthcare" xml:space="preserve">
+ <value>Healthcare</value>
+ </data>
+ <data name="OrganizationType_Other" xml:space="preserve">
+ <value>Other</value>
+ </data>
+</root>

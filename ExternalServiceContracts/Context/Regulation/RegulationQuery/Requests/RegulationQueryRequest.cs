@@ -1,20 +1,21 @@
-using APIGatewayService.Context.Common;
-using APIGatewayService.Context.Common.Request;
+using CommonSDK;
+using ExternalServiceContracts.Common;
+using System.Text;
 using System.Text.Json.Serialization;
 
-namespace APIGatewayService.Context.RegulationQuery
+namespace ExternalServiceContracts.Requests
 {
 	/// <summary>
 	/// Represents a user question or query that needs to be evaluated against regulation logic.
 	/// </summary>
-	public sealed class RegulationQueryRequest : IDeserializedRequest
+	public sealed class RegulationQueryRequest : ISerializableRequest
 	{
 		/// <summary>
 		/// The textual question to evaluate against regulation rules.
 		/// Serialized as JSON property 'question'.
 		/// </summary>
 		[JsonPropertyName("question")]
-		public string? Question { get; set; }
+		public string? Question { get; set; } = string.Empty;
 
 		/// <summary>
 		/// Contextual information accompanying the query (user, source, metadata).
@@ -29,5 +30,28 @@ namespace APIGatewayService.Context.RegulationQuery
 		/// </summary>
 		[JsonPropertyName("preferences")]
 		public QueryPreferences Preferences { get; init; } = default!;
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			AppendSelfAsString(sb);
+
+			return sb.ToString();
+		}
+
+		/// <inheritdoc/>
+		public void AppendSelfAsString(StringBuilder sb)
+		{
+			sb.AppendLine($"Question: {Question}");
+			Context.AppendSelfAsString(sb);
+			Preferences.AppendSelfAsString(sb);
+		}
+
+		/// <inheritdoc/>
+		public string GetRequestIdentifier()
+		{
+			return Question ?? string.Empty;
+		}
 	}
 }

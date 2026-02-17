@@ -1,6 +1,8 @@
 ﻿using APIGatewayService.Common;
 using APIGatewayService.Context.Common;
 using APIGatewayService.Context.RegulationQuery;
+using ExternalServiceContracts.Common;
+using ExternalServiceContracts.Requests;
 using System.Fabric;
 using System.Text.Json;
 
@@ -50,7 +52,7 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 			//TODO: Add actual logic to create response based on the deserialized request. For now, we return a default response indicating that the system was unable to provide a response.
 			deserializedResponse = new RegulationQueryResponse
 			{
-				ShortAnswer = "System was unable to provide response.",
+				ShortAnswer = "Server was unable to provide response.",
 				Explanation = string.Empty,
 				Citations = Enumerable.Empty<DocumentCitation>(),
 				Confidence = 0f,

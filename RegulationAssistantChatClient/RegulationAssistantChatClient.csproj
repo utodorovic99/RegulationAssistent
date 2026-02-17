@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+	<OutputType>WinExe</OutputType>
+	<TargetFramework>net8.0-windows</TargetFramework>
+	<UseWPF>true</UseWPF>
+	<ApplicationIcon>law.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<Content Include="law.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\ExternalServiceContracts\ExternalServiceContracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>

@@ -1,7 +1,6 @@
 using APIGatewayService.Common;
 using APIGatewayService.Common.Processors;
 using APIGatewayService.Context.Regulation.RegulationQuery.Requests;
-using APIGatewayService.Context.RegulationQuery;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using System.Fabric;
 using System.Net;
@@ -46,7 +45,7 @@ namespace APIGatewayService.Context.Regulation
 		public Task<string> OpenAsync(CancellationToken cancellationToken)
 		{
 			int port = context.CodePackageActivationContext.GetEndpoint(EndpointName).Port;
-			string url = $"http://+:{port}/RegulationQuery";
+			string url = $"http://+:{port}/RegulationQuery/";
 
 			_listener = new HttpListener();
 			_listener.Prefixes.Add(url);

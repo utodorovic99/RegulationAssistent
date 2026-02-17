@@ -1,5 +1,7 @@
 using APIGatewayService.Context.Common;
-using APIGatewayService.Context.Common.Request;
+using CommonSDK;
+using ExternalServiceContracts.Common;
+using ExternalServiceContracts.Requests;
 
 namespace APIGatewayService.Context.RegulationQuery
 {
@@ -14,7 +16,7 @@ namespace APIGatewayService.Context.RegulationQuery
 	internal class RegulationQueryRequestValidator : IRequestValidator<RegulationQueryRequest>
 	{
 		/// <inheritdoc/>
-		public bool TryValidateRequest(IDeserializedRequest? req, out string? error)
+		public bool TryValidateRequest(ISerializableRequest? req, out string? error)
 		{
 			RegulationQueryRequest? reqCasted = req as RegulationQueryRequest;
 
@@ -45,7 +47,7 @@ namespace APIGatewayService.Context.RegulationQuery
 		}
 
 		/// <summary>
-		/// Validates the query context (date, organization type, jurisdiction).
+		/// Validates the query context (date, organization type).
 		/// Treats default(DateOnly) as missing.
 		/// </summary>
 		/// <param name="ctx">Context to validate.</param>
@@ -61,12 +63,6 @@ namespace APIGatewayService.Context.RegulationQuery
 			if (ctx.Date == default)
 			{
 				error = "missing_context_date";
-				return false;
-			}
-
-			if (string.IsNullOrWhiteSpace(ctx.Jurisdiction))
-			{
-				error = "invalid_context";
 				return false;
 			}
 
@@ -94,7 +90,7 @@ namespace APIGatewayService.Context.RegulationQuery
 			}
 
 			// Ensure language is a defined enum value
-			if (!Enum.IsDefined(typeof(SupportedLanguage), pref.Language))
+			if (!Enum.IsDefined(typeof(Language), pref.Language))
 			{
 				error = "invalid_language";
 				return false;
