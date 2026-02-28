@@ -17,12 +17,12 @@
 		}
 
 		/// <summary>
-		/// The enum name used as the SelectedValue for the ComboBox.
+		/// Gets enum name used as the SelectedValue for the ComboBox.
 		/// </summary>
 		public string Tag { get; }
 
 		/// <summary>
-		/// The localized display text.
+		/// Gets localized display text.
 		/// </summary>
 		public string Display { get; set; }
 	}

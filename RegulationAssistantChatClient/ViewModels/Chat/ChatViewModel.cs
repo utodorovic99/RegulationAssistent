@@ -1,7 +1,3 @@
-using ExternalServiceContracts.Common;
-using ExternalServiceContracts.Requests;
-using RegulationAssistantChatClient.Extensions;
-using RegulationAssistantChatClient.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,6 +5,11 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ExternalServiceContracts.Common;
+using ExternalServiceContracts.Requests;
+using ExternalServiceContracts.Responses;
+using RegulationAssistantChatClient.Extensions;
+using RegulationAssistantChatClient.Services;
 
 namespace RegulationAssistantChatClient.ViewModels
 {
@@ -59,12 +60,12 @@ namespace RegulationAssistantChatClient.ViewModels
 		public event PropertyChangedEventHandler? PropertyChanged;
 
 		/// <summary>
-		/// Collection of chat messages shown in the UI.
+		/// Gets collection of chat messages shown in the UI.
 		/// </summary>
 		public ObservableCollection<ChatMessage> ChatMessages { get; }
 
 		/// <summary>
-		/// The user's current question text.
+		/// Gets or sets user's current question text.
 		/// </summary>
 		public string Question
 		{
@@ -82,7 +83,7 @@ namespace RegulationAssistantChatClient.ViewModels
 		}
 
 		/// <summary>
-		/// The date used as context for regulation queries. Bound to the DatePicker in the UI.
+		/// Gets or set the date used as context for regulation queries. Bound to the DatePicker in the UI.
 		/// </summary>
 		public DateTime? SelectedDate
 		{
@@ -99,7 +100,7 @@ namespace RegulationAssistantChatClient.ViewModels
 		}
 
 		/// <summary>
-		/// The selected organization type (enum name as string). Bound to the ComboBox selected value.
+		/// Gets or sets selected organization type (enum name as string). Bound to the ComboBox selected value.
 		/// </summary>
 		public string SelectedOrganizationTypeString
 		{
@@ -116,32 +117,33 @@ namespace RegulationAssistantChatClient.ViewModels
 		}
 
 		/// <summary>
-		/// Collection of localized organization type items shown in the ComboBox.
+		/// Gets collection of localized organization type items shown in the ComboBox.
 		/// </summary>
 		public ObservableCollection<OrganizationTypeItem> OrganizationTypes { get; }
 
 		/// <summary>
-		/// The currently selected language name (e.g. "English" or "Serbian"). Read from the OptionsViewModel.
+		/// Gets currently selected language name (e.g. "English" or "Serbian"). Read from the OptionsViewModel.
 		/// </summary>
 		public string Language { get; private set; }
 
 		/// <summary>
-		/// The user's selected response type label. Read from the OptionsViewModel.
+		/// Gets user's selected response type label. Read from the OptionsViewModel.
 		/// </summary>
 		public string ResponseType { get; private set; }
 
 		/// <summary>
-		/// Command bound to the Send button. Executes sending the current question.
+		/// Gets command bound to the Send button. Executes sending the current question.
 		/// </summary>
 		public ICommand SendCommand { get; }
 
 		/// <summary>
-		/// Command bound to the Clear button. Clears the chat when executed.
+		/// Gets command bound to the Clear button. Clears the chat when executed.
 		/// </summary>
 		public ICommand ClearChatCommand { get; }
 
 		/// <summary>
-		/// Localized label for the Send button.
+		/// Gets
+		/// lLocalized label for the Send button.
 		/// </summary>
 		public string SendButtonLabel
 		{
@@ -152,7 +154,7 @@ namespace RegulationAssistantChatClient.ViewModels
 		}
 
 		/// <summary>
-		/// Localized label for the Clear Chat button.
+		/// Gets localized label for the Clear Chat button.
 		/// </summary>
 		public string ClearButtonLabel
 		{
@@ -165,7 +167,7 @@ namespace RegulationAssistantChatClient.ViewModels
 		/// <summary>
 		/// Property changed notification helper. Raises the PropertyChanged event for the specified property name. When called without arguments, it uses the caller member name as the property name.
 		/// </summary>
-		/// <param name="propertyName"></param>
+		/// <param name="propertyName">Name of the property.</param>
 		protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -215,9 +217,11 @@ namespace RegulationAssistantChatClient.ViewModels
 					case "English":
 						culture = new CultureInfo("en");
 						break;
+
 					case "Serbian":
 						culture = new CultureInfo("sr");
 						break;
+
 					default:
 						culture = CultureInfo.CurrentUICulture ?? CultureInfo.InvariantCulture;
 						break;

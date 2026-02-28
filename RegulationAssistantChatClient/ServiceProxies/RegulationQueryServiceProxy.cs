@@ -1,11 +1,11 @@
-using ExternalServiceContracts.Common;
-using ExternalServiceContracts.Requests;
-using RegulationAssistantChatClient.Configuration;
 using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ExternalServiceContracts.Requests;
+using ExternalServiceContracts.Responses;
+using RegulationAssistantChatClient.Configuration;
 
 namespace RegulationAssistantChatClient.Services
 {

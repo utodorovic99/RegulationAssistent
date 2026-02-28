@@ -18,8 +18,7 @@ namespace RegulationAssistantChatClient.ViewModels
 		public event PropertyChangedEventHandler? PropertyChanged;
 
 		/// <summary>
-		/// Currently selected language name displayed in the UI and used for localization decisions.
-		/// Default is "Serbian".
+		/// Gets or sets currently selected language name displayed in the UI and used for localization decisions.
 		/// </summary>
 		public string Language
 		{
@@ -37,7 +36,7 @@ namespace RegulationAssistantChatClient.ViewModels
 		}
 
 		/// <summary>
-		/// Selected answer style (e.g. "Concise with Citations").
+		/// Gets or sets selected answer style.
 		/// </summary>
 		public string ResponseType
 		{
@@ -59,7 +58,7 @@ namespace RegulationAssistantChatClient.ViewModels
 		}
 
 		/// <summary>
-		/// Raises the <see cref="PropertyChanged"/> event.
+		/// Raises when property changes.
 		/// </summary>
 		/// <param name="propertyName">Name of property that changed (inferred from caller when omitted).</param>
 		protected void OnPropertyChanged([CallerMemberName] string propertyName = null)

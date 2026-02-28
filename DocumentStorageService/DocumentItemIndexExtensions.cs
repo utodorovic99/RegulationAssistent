@@ -1,0 +1,27 @@
+﻿using DocumentStorageService.Storage;
+using ExternalServiceContracts.Context.Regulation.Documents.Responses;
+
+namespace DocumentStorageService
+{
+	/// <summary>
+	/// Extension class for <see cref="DocumentItemIndex"/>
+	/// </summary>
+	internal static class DocumentItemIndexExtensions
+	{
+		/// <summary>
+		/// Converts a <see cref="DocumentItemIndex"/> to a <see cref="DocumentItemDescriptor"/>.
+		/// </summary>
+		/// <param name="index">Document index to convert.</param>
+		/// <returns><see cref="DocumentItemDescriptor"/> corresponding to the current instance.</returns>
+		public static DocumentItemDescriptor ToDescriptor(this DocumentItemIndex index)
+		{
+			return new DocumentItemDescriptor
+			{
+				Title = index.Title,
+				VersionNumber = index.VersionNumber,
+				ValidFrom = index.ValidFrom,
+				ValidTo = index.ValidTo,
+			};
+		}
+	}
+}

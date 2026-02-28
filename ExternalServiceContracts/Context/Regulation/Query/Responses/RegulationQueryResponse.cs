@@ -1,13 +1,14 @@
-﻿using CommonSDK;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
+using CommonSDK;
+using ExternalServiceContracts.Common;
 
-namespace ExternalServiceContracts.Common
+namespace ExternalServiceContracts.Responses
 {
 	/// <summary>
-	/// Represents the response to a regulation query, including a short answer, an explanation, relevant document citations, and a confidence score indicating the reliability of the answer.
+	/// Represents the response to a regulation query, including all relevant information.
 	/// </summary>
 	public sealed class RegulationQueryResponse : ISerializableResponse, IOptimizedStringOperations
 	{
@@ -15,13 +16,13 @@ namespace ExternalServiceContracts.Common
 		/// Gets a concise answer to the regulation query. This should provide a brief and direct response to the question asked, summarizing the key information derived from the relevant regulations.
 		/// </summary>
 		[JsonPropertyName("short-answer")]
-		public string? ShortAnswer { get; init; } = string.Empty;
+		public string ShortAnswer { get; init; } = string.Empty;
 
 		/// <summary>
 		/// Gets a detailed explanation that provides context and reasoning behind the short answer. This should elaborate on how the answer was derived, referencing specific regulations, interpretations, or any relevant information that supports the conclusion presented in the short answer.
 		/// </summary>
 		[JsonPropertyName("explanation")]
-		public string? Explanation { get; init; } = string.Empty;
+		public string Explanation { get; init; } = string.Empty;
 
 		/// <summary>
 		/// Gets a collection of document citations that are relevant to the regulation query. Each citation should include information about the document name, version, section identifier, and the specific citation text that supports the answer provided. This allows users to reference the original sources of information for further reading or verification.

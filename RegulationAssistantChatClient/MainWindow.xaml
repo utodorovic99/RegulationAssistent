@@ -6,11 +6,15 @@
  xmlns:vm="clr-namespace:RegulationAssistantChatClient.ViewModels"
  xmlns:views="clr-namespace:RegulationAssistantChatClient.Views"
  mc:Ignorable="d"
- Title="Regulation Assistant" Height="450" Width="800">
+ Title="Regulation Assistant" Height="450" Width="800" WindowState="Maximized">
 	<Grid>
 		<TabControl>
 			<TabItem Header="Chat">
 				<views:ChatView />
+			</TabItem>
+
+			<TabItem Header="Documents">
+				<views:DocumentsView />
 			</TabItem>
 
 			<TabItem Header="Options">

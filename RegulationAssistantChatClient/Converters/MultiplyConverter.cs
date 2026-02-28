@@ -26,7 +26,7 @@ namespace RegulationAssistantChatClient.Converters
 		{
 			if (value is double d)
 			{
-				double factor =1.0;
+				double factor = 1.0;
 				if (parameter != null)
 				{
 					if (parameter is string s && double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var p))

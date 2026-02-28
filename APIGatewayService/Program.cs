@@ -1,5 +1,5 @@
-using Microsoft.ServiceFabric.Services.Runtime;
 using System.Diagnostics;
+using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace APIGatewayService
 {

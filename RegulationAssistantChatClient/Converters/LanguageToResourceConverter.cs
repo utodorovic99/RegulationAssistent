@@ -19,13 +19,13 @@ namespace RegulationAssistantChatClient.Converters
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
 			string language = value as string;
-			if (language is null)
+			if (language == null)
 			{
 				language = string.Empty;
 			}
 
 			string key = parameter as string;
-			if (key is null)
+			if (key == null)
 			{
 				key = string.Empty;
 			}

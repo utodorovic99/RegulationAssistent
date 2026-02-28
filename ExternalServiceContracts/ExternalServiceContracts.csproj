@@ -1,11 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
- <PropertyGroup>
- <TargetFramework>net8.0</TargetFramework>
- </PropertyGroup>
+  <PropertyGroup>
+	<TargetFramework>net8.0</TargetFramework>
+	<Platforms>x64</Platforms>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
 
- <ItemGroup>
-   <ProjectReference Include="..\CommonSDK\CommonSDK.csproj" />
- </ItemGroup>
+  <ItemGroup>
+	<ProjectReference Include="..\CommonSDK\CommonSDK.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="7.1.2448" />
+  </ItemGroup>
 
 </Project>

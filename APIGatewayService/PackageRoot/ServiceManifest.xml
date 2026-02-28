@@ -5,12 +5,9 @@
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <ServiceTypes>
-	<!-- This is the name of your ServiceType.
-			 This name must match the string used in the RegisterServiceAsync call in Program.cs. -->
 	<StatelessServiceType ServiceTypeName="APIGatewayServiceType" />
   </ServiceTypes>
 
-  <!-- Code package is your service executable. -->
   <CodePackage Name="Code" Version="1.0.0">
 	<EntryPoint>
 	  <ExeHost>
@@ -19,15 +16,10 @@
 	</EntryPoint>
   </CodePackage>
 
-  <!-- Config package is the contents of the Config directory under PackageRoot that contains an
-			independently-updateable and versioned set of custom configuration settings for your service. -->
   <ConfigPackage Name="Config" Version="1.0.0" />
 
   <Resources>
 	<Endpoints>
-	  <!-- This endpoint is used by the communication listener to obtain the port on which to
-				 listen. Ensure your listener uses the same endpoint Name ("ServiceEndpoint"). -->
-	  <!-- Set Protocol="http" and a fixed port for local testing. Change Port as required for your environment. -->
 	  <Endpoint Name="ServiceEndpoint" Protocol="http" Port="8080" Type="Input" />
 	</Endpoints>
   </Resources>

@@ -9,12 +9,12 @@ namespace ExternalServiceContracts.Requests
 	public sealed class RegulationQueryContext
 	{
 		/// <summary>
-		/// The date when the query is made or applies.
+		/// Gets date when the query is made or applies.
 		/// </summary>
 		public DateOnly Date { get; init; } = default;
 
 		/// <summary>
-		/// The type of organization making the query.
+		/// Gets type of organization making the query.
 		/// </summary>
 		public OrganizationType OrganizationType { get; init; } = OrganizationType.Other;
 

@@ -1,5 +1,5 @@
-using RegulationAssistantChatClient.ViewModels;
 using System.Windows;
+using RegulationAssistantChatClient.ViewModels;
 
 namespace RegulationAssistantChatClient
 {

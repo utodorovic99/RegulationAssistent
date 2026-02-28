@@ -1,6 +1,6 @@
-﻿using CommonSDK;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json.Serialization;
+using CommonSDK;
 
 namespace ExternalServiceContracts.Common
 {

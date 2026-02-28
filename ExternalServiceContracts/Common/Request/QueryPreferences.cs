@@ -1,5 +1,5 @@
-﻿using CommonSDK;
-using System.Text;
+﻿using System.Text;
+using CommonSDK;
 
 namespace ExternalServiceContracts.Common
 {
@@ -9,12 +9,12 @@ namespace ExternalServiceContracts.Common
 	public sealed class QueryPreferences : IOptimizedStringOperations
 	{
 		/// <summary>
-		/// Preferred language for the answer (e.g., <see cref="Language.En"/>, <see cref="Language.RS"/>).
+		/// Gets or sets preferred language for the answer.
 		/// </summary>
 		public Language Language { get; init; } = Language.RS;
 
 		/// <summary>
-		/// Preferred answer style (e.g., <see cref="AnswerStyle.ConciseWithCitations"/>, <see cref="AnswerStyle.Detailed"/>, <see cref="AnswerStyle.BulletPoints"/>).
+		/// Gets or sets preferred answer style.
 		/// </summary>
 		public AnswerStyle AnswerStyle { get; init; } = AnswerStyle.ConciseWithCitations;
 

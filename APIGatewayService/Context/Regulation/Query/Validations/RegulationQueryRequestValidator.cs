@@ -6,21 +6,18 @@ using ExternalServiceContracts.Requests;
 namespace APIGatewayService.Context.RegulationQuery
 {
 	/// <summary>
-	/// Provides methods to validate a <see cref="RegulationQueryRequest"/> and its associated components, including
-	/// context and preferences, ensuring that all required fields are present and valid.
+	/// Provides methods to validate a <see cref="RegulationQueryRequest"/>.
 	/// </summary>
-	/// <remarks>
-	/// This class contains static methods for validating different parts of a regulation query request. It
-	/// ensures that the request, context, and preferences conform to the expected structure and values. Validation errors
-	/// are returned as error codes to help identify specific issues.</remarks>
-	internal class RegulationQueryRequestValidator : IRequestValidator<RegulationQueryRequest>
+	internal sealed class RegulationQueryRequestValidator : IRequestValidator
 	{
 		/// <inheritdoc/>
 		public bool TryValidateRequest(ISerializableRequest? req, out string? error)
 		{
+			error = null;
+
 			RegulationQueryRequest? reqCasted = req as RegulationQueryRequest;
 
-			if (req is null)
+			if (req == null)
 			{
 				error = "missing_request";
 				return false;
@@ -42,18 +39,18 @@ namespace APIGatewayService.Context.RegulationQuery
 				return false;
 			}
 
-			error = null;
 			return true;
 		}
 
 		/// <summary>
 		/// Validates the query context (date, organization type).
-		/// Treats default(DateOnly) as missing.
 		/// </summary>
 		/// <param name="ctx">Context to validate.</param>
 		/// <param name="error">Error code when validation fails.</param>
 		private bool TryValidateContext(RegulationQueryContext? ctx, out string? error)
 		{
+			error = null;
+
 			if (ctx == null)
 			{
 				error = "missing_context";
@@ -72,7 +69,6 @@ namespace APIGatewayService.Context.RegulationQuery
 				return false;
 			}
 
-			error = null;
 			return true;
 		}
 
@@ -83,13 +79,14 @@ namespace APIGatewayService.Context.RegulationQuery
 		/// <param name="error">Error code when validation fails.</param>
 		private bool TryValidatePreferences(QueryPreferences? pref, out string? error)
 		{
+			error = null;
+
 			if (pref == null)
 			{
 				error = "missing_preferences";
 				return false;
 			}
 
-			// Ensure language is a defined enum value
 			if (!Enum.IsDefined(typeof(Language), pref.Language))
 			{
 				error = "invalid_language";
@@ -102,7 +99,6 @@ namespace APIGatewayService.Context.RegulationQuery
 				return false;
 			}
 
-			error = null;
 			return true;
 		}
 	}

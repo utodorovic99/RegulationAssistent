@@ -1,6 +1,6 @@
-﻿using ExternalServiceContracts.Common;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
+using ExternalServiceContracts.Responses;
 
 namespace RegulationAssistantChatClient.Extensions
 {

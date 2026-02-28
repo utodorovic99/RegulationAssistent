@@ -5,8 +5,7 @@ namespace APIGatewayService.Context.Common
 	/// <summary>
 	/// Interface for validating request objects.
 	/// </summary>
-	internal interface IRequestValidator<T>
-		where T : ISerializableRequest
+	internal interface IRequestValidator
 	{
 		/// <summary>
 		/// Validates the request.

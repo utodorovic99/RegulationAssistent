@@ -1,9 +1,9 @@
-using ExternalServiceContracts.Common;
-using RegulationAssistantChatClient.Properties;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
+using ExternalServiceContracts.Common;
+using RegulationAssistantChatClient.Properties;
 
 namespace RegulationAssistantChatClient.Extensions
 {

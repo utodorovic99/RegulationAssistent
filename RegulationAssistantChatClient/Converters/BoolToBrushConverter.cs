@@ -12,12 +12,12 @@ namespace RegulationAssistantChatClient.Converters
 	public class BoolToBrushConverter : IValueConverter
 	{
 		/// <summary>
-		/// Brush returned when the input value is true. Defaults to <see cref="Brushes.DodgerBlue"/>.
+		/// Gets or sets brush returned when the input value is true.
 		/// </summary>
 		public Brush TrueBrush { get; set; } = Brushes.DodgerBlue;
 
 		/// <summary>
-		/// Brush returned when the input value is false. Defaults to <see cref="Brushes.Gray"/>.
+		/// Gets or sets brush returned when the input value is false.
 		/// </summary>
 		public Brush FalseBrush { get; set; } = Brushes.Gray;
 
