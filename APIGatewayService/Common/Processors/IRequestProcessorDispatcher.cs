@@ -17,7 +17,7 @@ namespace APIGatewayService.Common.Processors
 		/// Dispatches the given request to the appropriate processor based on the registered triggering conditions.
 		/// </summary>
 		/// <param name="request">Request to dispatch.</param>
-		/// <param name="result">Processing result if dispatch is successful; otherwise default value.</param>
-		void Dispatch(IProcessingObject request, out IProcessingResult result);
+		/// <returns>Processing result coming from associated processor.</returns>
+		public Task<IProcessingResult> DispatchAsync(IProcessingObject request);
 	}
 }

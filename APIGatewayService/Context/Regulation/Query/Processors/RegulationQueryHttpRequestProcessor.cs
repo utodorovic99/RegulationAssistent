@@ -17,16 +17,14 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 	/// </summary>
 	internal sealed class RegulationQueryHttpRequestProcessor : BaseHttpRequestProcessor
 	{
-		private const string TriggerPath = "/RegulationQuery/Submit";
-		private const string TriggerHttpMethod = "POST";
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RegulationQueryHttpRequestProcessor"/> class with the specified service context and a default request validator.
 		/// </summary>
 		/// <param name="serviceContext">Service context.</param>
 		public RegulationQueryHttpRequestProcessor(StatelessServiceContext serviceContext)
-			: base(TriggerPath,
-				TriggerHttpMethod,
+			: base(httpPrefix: "RegulationQuery",
+				triggerPath: "/RegulationQuery/Submit",
+				triggerHttpMethod: "POST",
 				new RegulationQueryRequestValidator(),
 				serviceContext)
 		{
@@ -35,19 +33,23 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RegulationQueryHttpRequestProcessor"/> class with the specified request validator, serialization options, and service context.
 		/// </summary>
+		/// <param name="httpPrefix">HTTP prefix associated with the request.</param>
 		/// <param name="triggerHttpMethod">Method to which processor responds.</param>
 		/// <param name="triggerPath">API path of request.</param>
 		/// <param name="requestValidator">The validator used to validate incoming requests.</param>
 		/// <param name="serializationOptions">The options for serializing responses.</param>
 		/// <param name="deserializationOptions">The options for deserializing requests.</param>
 		/// <param name="serviceContext">The Service Fabric context for logging and configuration.</param>
-		internal RegulationQueryHttpRequestProcessor(string triggerPath,
+		internal RegulationQueryHttpRequestProcessor(
+			string httpPrefix,
+			string triggerPath,
 			string triggerHttpMethod,
 			IRequestValidator requestValidator,
 			JsonSerializerOptions serializationOptions,
 			JsonSerializerOptions deserializationOptions,
 			StatelessServiceContext serviceContext)
-				: base(triggerPath,
+				: base(httpPrefix,
+					triggerPath,
 					triggerHttpMethod,
 					requestValidator,
 					serializationOptions,

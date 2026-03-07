@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ExternalServiceContracts.Context.Regulation.Documents.Responses;
+using ExternalServiceContracts.Requests;
 using Microsoft.Win32;
 using RegulationAssistantChatClient.ViewModels.Documents;
 
@@ -59,7 +60,7 @@ namespace RegulationAssistantChatClient.Views
 		/// <summary>
 		/// Handler for requested document upload.
 		/// </summary>
-		private void Vm_UploadRequested()
+		private async void Vm_UploadRequested()
 		{
 			var dlg = new OpenFileDialog();
 			dlg.Filter = "Word Documents|*.docx;*.doc|All files|*.*";
@@ -71,18 +72,23 @@ namespace RegulationAssistantChatClient.Views
 					string path = dlg.FileName;
 					byte[] bytes = File.ReadAllBytes(path);
 
-					var item = new DocumentItemDescriptor
+					var request = new DocumentUploadRequest
 					{
 						Title = Path.GetFileName(path),
-						VersionNumber = 1,
 						ValidFrom = DateTime.Now.Date,
+						FileBytes = bytes
 					};
 
-					vm.AddDocument(item);
+					var uploadedDocument = await vm.UploadDocumentAsync(request);
+					
+					if (uploadedDocument == null)
+					{
+						MessageBox.Show("Failed to upload document to the service.", "Upload Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+					}
 				}
 				catch (Exception ex)
 				{
-					MessageBox.Show("Error adding document: " + ex.Message);
+					MessageBox.Show("Error uploading document: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
 		}
@@ -93,22 +99,8 @@ namespace RegulationAssistantChatClient.Views
 		/// <param name="doc">Document whose edit is requested.</param>
 		private void Vm_EditRequested(DocumentItemDescriptor? doc)
 		{
-			if (doc == null)
-			{
-				return;
-			}
-
-			var win = new Window
-			{
-				Title = "Edit Document",
-				Width = 400,
-				Height = 200,
-				WindowStartupLocation = WindowStartupLocation.CenterOwner,
-				Owner = Application.Current.MainWindow,
-				Content = new DocumentEditView(doc)
-			};
-
-			win.ShowDialog();
+			// The document will be opened in Microsoft Word directly via the view model
+			// No need to show a dialog anymore
 		}
 	}
 }

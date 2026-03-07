@@ -1,15 +1,19 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using CommonSDK;
+using ExternalServiceContracts.Context.Regulation.Documents.Responses;
 
-namespace ExternalServiceContracts.Context.Regulation.Documents.Responses
+namespace ExternalServiceContracts.Responses
 {
 	/// <summary>
-	/// Response to the request to get documents.
+	/// Represents the response returned when retrieving the documents.
 	/// </summary>
-	public sealed class GetDocumentsResponse
+	public sealed class GetDocumentsResponse : ISerializableResponse
 	{
 		/// <summary>
-		/// Gets or sets collection of documents as response.
+		/// Gets or sets the list of document descriptors.
 		/// </summary>
-		public IEnumerable<DocumentItemDescriptor> Documents { get; set; }
+		[JsonPropertyName("documents")]
+		public List<DocumentItemDescriptor> Documents { get; set; } = new List<DocumentItemDescriptor>();
 	}
 }

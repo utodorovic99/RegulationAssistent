@@ -15,38 +15,59 @@ namespace APIGatewayService.Common.Listeners
 		private readonly string endpointName;
 		private readonly string listenerName;
 		private readonly StatelessServiceContext context;
-		private readonly string apiPrefix;
-		private readonly IRequestProcessorDispatcher requestProcessorDispatcher;
+		private readonly IRequestProcessorDispatcher dispatcher;
 
 		private HttpListener? listener;
 		private CancellationTokenSource? cts;
 		private Task? listenTask;
 
 		/// <summary>
-		/// Initializes new instance of <see cref="HttpListenerWrapper"/> with the provided Service Fabric context and sets up request processing."/>
+		/// Initializes new instance of <see cref="HttpListenerWrapper"/> with multiple API prefixes and processors.
 		/// </summary>
 		/// <param name="context">Service fabric context.</param>
 		/// <param name="endpointName">Name of the endpoint to listen on, as defined in the Service Fabric configuration.</param>
-		/// <param name="apiPrefix">API prefix to listen on (e.g., "api/documents").</param>
-		/// <param name="requestProcessors">Collection of request processors to register with the listener.</param>
-		/// <exception cref="ArgumentNullException">If <paramref name="context"/> is <c>null</c>.</exception>
+		/// <param name="requestProcessors">Dictionary mapping API prefixes to their request processors.</param>
+		/// <exception cref="ArgumentNullException">If any parameter is <c>null</c>.</exception>
 		public HttpListenerWrapper(StatelessServiceContext context,
 			string endpointName,
-			string apiPrefix,
-			IEnumerable<IRequestProcessor> requestProcessors)
+			IEnumerable<IHttpRequestProcessor> requestProcessors)
+			: this(context, endpointName, new HttpListener(), new RequestProcessorDispatcher(), requestProcessors)
+		{
+		}
+
+		/// <summary>
+		/// Initializes new instance of <see cref="HttpListenerWrapper"/> with multiple API prefixes and processors.
+		/// </summary>
+		/// <param name="context">Service fabric context.</param>
+		/// <param name="endpointName">Name of the endpoint to listen on, as defined in the Service Fabric configuration.</param>
+		/// <param name="requestProcessors">Dictionary mapping API prefixes to their request processors.</param>
+		/// <exception cref="ArgumentNullException">If any parameter is <c>null</c>.</exception>
+		internal HttpListenerWrapper(StatelessServiceContext context,
+			string endpointName,
+			HttpListener listener,
+			IRequestProcessorDispatcher dispatcher,
+			IEnumerable<IHttpRequestProcessor> requestProcessors)
 		{
 			ArgumentNullException.ThrowIfNull(context);
-			ArgumentNullException.ThrowIfNull(endpointName);
-			ArgumentNullException.ThrowIfNull(apiPrefix);
+			ArgumentNullException.ThrowIfNullOrEmpty(endpointName);
+			ArgumentNullException.ThrowIfNull(listener);
+			ArgumentNullException.ThrowIfNull(dispatcher);
 			ArgumentNullException.ThrowIfNull(requestProcessors);
 
-			this.apiPrefix = apiPrefix;
+			this.context = context;
+			this.endpointName = endpointName;
+			this.listener = listener;
+			this.dispatcher = dispatcher;
 			listenerName = GetType().Name;
-			requestProcessorDispatcher = new RequestProcessorDispatcher();
 
-			foreach (var requestProcessor in requestProcessors)
+			int port = context.CodePackageActivationContext.GetEndpoint(endpointName).Port;
+
+			foreach (var processor in requestProcessors)
 			{
-				requestProcessorDispatcher.RegisterProcessor(requestProcessor);
+				dispatcher.RegisterProcessor(processor);
+
+				string url = $"http://+:{port}/{processor.HttpPrefix}/";
+				listener.Prefixes.Add(url);
 			}
 		}
 
@@ -57,18 +78,15 @@ namespace APIGatewayService.Common.Listeners
 		/// <returns>A task that represents the asynchronous operation. The task result contains the fully qualified URL where the service is accessible.</returns>
 		public Task<string> OpenAsync(CancellationToken cancellationToken)
 		{
-			int port = context.CodePackageActivationContext.GetEndpoint(endpointName).Port;
-			string url = $"http://+:{port}/{apiPrefix}/";
-
-			listener = new HttpListener();
-			listener.Prefixes.Add(url);
 			listener.Start();
 
 			cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 			listenTask = Task.Run(() => ListenLoopAsync(cts.Token), CancellationToken.None);
 
-			string publishedUrl = url.Replace("+", context.NodeContext.IPAddressOrFQDN);
+			int port = context.CodePackageActivationContext.GetEndpoint(endpointName).Port;
+			string publishedUrl = $"http://{context.NodeContext.IPAddressOrFQDN}:{port}/";
 			ServiceEventSource.Current.ServiceMessage(context, $"{listenerName} started on {publishedUrl}");
+
 			return Task.FromResult(publishedUrl);
 		}
 
@@ -156,8 +174,19 @@ namespace APIGatewayService.Common.Listeners
 		{
 			try
 			{
+				string path = ctx.Request.Url?.AbsolutePath.Trim('/') ?? string.Empty;
+				string apiPrefix = path.Split('/')[0];
+
 				HttpProcessObject httpRequestProccessObj = new HttpProcessObject(ctx);
-				requestProcessorDispatcher.Dispatch(httpRequestProccessObj, out IProcessingResult result);
+				IProcessingResult result = await dispatcher.DispatchAsync(httpRequestProccessObj);
+
+				if (!result.IsSuccessful)
+				{
+					ctx.Response.StatusCode = (int)HttpStatusCode.NotFound;
+					await WriteStringResponseAsync(ctx.Response, "{\"error\":\"not_found\"}").ConfigureAwait(false);
+					return;
+				}
+
 				return;
 			}
 			catch (Exception ex)

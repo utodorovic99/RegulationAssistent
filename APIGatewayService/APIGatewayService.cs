@@ -1,5 +1,6 @@
 using System.Fabric;
 using APIGatewayService.Common.Listeners;
+using APIGatewayService.Common.ServiceProxies;
 using APIGatewayService.Context.Regulation.Documents;
 using APIGatewayService.Context.Regulation.RegulationQuery.Requests;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -12,6 +13,8 @@ namespace APIGatewayService
 	/// </summary>
 	internal sealed class APIGatewayService : StatelessService
 	{
+		private readonly ServiceProxyPool serviceProxyPool;
+
 		/// <summary>
 		/// Creates a new instance of <see cref="APIGatewayService"/>.
 		/// </summary>
@@ -19,6 +22,7 @@ namespace APIGatewayService
 		public APIGatewayService(StatelessServiceContext context)
 			: base(context)
 		{
+			serviceProxyPool = new ServiceProxyPool();
 		}
 
 		/// <summary>
@@ -27,24 +31,20 @@ namespace APIGatewayService
 		/// <returns>A collection of listeners.</returns>
 		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
 		{
-			return new ServiceInstanceListener[2]
-			{
+			return
+			[
 				new ServiceInstanceListener(serviceContext =>
 					new HttpListenerWrapper(serviceContext,
 						endpointName: "ServiceEndpoint",
-						apiPrefix: "RegulationQuery",
+						requestProcessors:
 						[
-							new RegulationQueryHttpRequestProcessor(serviceContext)
-						])),
-
-				new ServiceInstanceListener(serviceContext =>
-					new HttpListenerWrapper(serviceContext,
-						endpointName: "ServiceEndpoint",
-						apiPrefix: "Documents",
-						[
-							new DocumentUploadHttpRequestProcessor(serviceContext)
-						])),
-			};
+							new RegulationQueryHttpRequestProcessor(serviceContext),
+							new DocumentUploadHttpRequestProcessor(serviceContext, serviceProxyPool),
+							new GetDocumentsHttpRequestProcessor(serviceContext, serviceProxyPool),
+							new GetDocumentHttpRequestProcessor(serviceContext, serviceProxyPool),
+							new DeleteDocumentHttpRequestProcessor(serviceContext, serviceProxyPool)
+						]))
+			];
 		}
 	}
 }

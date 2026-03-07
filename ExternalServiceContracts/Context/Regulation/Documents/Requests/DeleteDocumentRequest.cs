@@ -1,0 +1,27 @@
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+using CommonSDK;
+
+namespace ExternalServiceContracts.Context.Regulation.Documents.Requests
+{
+	/// <summary>
+	/// Request to delete a specific document by title and version.
+	/// </summary>
+	[DataContract]
+	public sealed class DeleteDocumentRequest : ISerializableRequest
+	{
+		/// <summary>
+		/// Gets or sets the title of the document to delete.
+		/// </summary>
+		[JsonPropertyName("title")]
+		[DataMember]
+		public string Title { get; set; } = string.Empty;
+
+		/// <summary>
+		/// Gets or sets the version number of the document to delete.
+		/// </summary>
+		[JsonPropertyName("versionNumber")]
+		[DataMember]
+		public int VersionNumber { get; set; }
+	}
+}

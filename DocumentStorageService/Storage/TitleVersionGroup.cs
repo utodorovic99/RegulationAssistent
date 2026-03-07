@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using DocumentStorageService.Storage;
 
 namespace DocumentStorageService
@@ -5,16 +6,19 @@ namespace DocumentStorageService
 	/// <summary>
 	/// Represent group of title versions.
 	/// </summary>
+	[DataContract]
 	internal sealed class TitleVersionGroup
 	{
 		/// <summary>
 		/// Gets or sets document title shared by the grouped versions.
 		/// </summary>
+		[DataMember]
 		public string Title { get; set; } = string.Empty;
 
 		/// <summary>
-		/// Gets descriptors for each version.
+		/// Gets or sets descriptors for each version.
 		/// </summary>
-		public List<DocumentItemIndex> Versions { get; } = new List<DocumentItemIndex>();
+		[DataMember]
+		public List<DocumentItemIndex> Versions { get; set; } = new List<DocumentItemIndex>();
 	}
 }

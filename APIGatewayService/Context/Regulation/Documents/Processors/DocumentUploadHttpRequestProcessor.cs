@@ -3,11 +3,11 @@ using System.Net;
 using System.Text.Json;
 using APIGatewayService.Common.Listeners;
 using APIGatewayService.Common.Processors;
+using APIGatewayService.Common.ServiceProxies;
 using APIGatewayService.Context.Common;
 using CommonSDK;
 using ExternalServiceContracts.Context.Regulation.Documents.Responses;
 using ExternalServiceContracts.Requests;
-using ExternalServiceContracts.Services;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 
@@ -18,48 +18,51 @@ namespace APIGatewayService.Context.Regulation.Documents
 	/// </summary>
 	internal sealed class DocumentUploadHttpRequestProcessor : BaseHttpRequestProcessor
 	{
-		private const string TriggerPath = "/Documents/Add";
-		private const string TriggerHttpMethod = "POST";
-
-		private readonly IDocumentStorageService documentStorageServiceProxy;
+		private readonly ServiceProxyPool serviceProxyPool;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DocumentUploadHttpRequestProcessor"/> class.
 		/// </summary>
 		/// <param name="serviceContext">Service context.</param>
-		public DocumentUploadHttpRequestProcessor(StatelessServiceContext serviceContext)
-			: base(TriggerPath,
-				TriggerHttpMethod,
+		/// <param name="serviceProxyPool">Service proxy pool for accessing service proxies.</param>
+		public DocumentUploadHttpRequestProcessor(StatelessServiceContext serviceContext, ServiceProxyPool serviceProxyPool)
+			: base(httpPrefix: "Documents",
+				triggerPath: "/Documents/Add",
+				triggerHttpMethod: "POST",
 				new DocumentUploadRequestValidator(),
 				serviceContext)
 		{
-			documentStorageServiceProxy = CreateDocumentStorageServiceProxy();
+			this.serviceProxyPool = serviceProxyPool ?? throw new ArgumentNullException(nameof(serviceProxyPool));
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DocumentUploadHttpRequestProcessor"/> class with the specified request validator, serialization options, and service context.
 		/// </summary>
+		/// <param name="httpPrefix">HTTP prefix associated with the request.</param>
 		/// <param name="triggerHttpMethod">Method to which processor responds.</param>
 		/// <param name="triggerPath">API path of request.</param>
 		/// <param name="requestValidator">The validator used to validate incoming requests.</param>
 		/// <param name="serializationOptions">The options for serializing responses.</param>
 		/// <param name="deserializationOptions">The options for deserializing requests.</param>
 		/// <param name="serviceContext">The Service Fabric context for logging and configuration.</param>
-		internal DocumentUploadHttpRequestProcessor(string triggerPath,
+		/// <param name="serviceProxyPool">Service proxy pool for accessing service proxies.</param>
+		internal DocumentUploadHttpRequestProcessor(string httpPrefix,
+			string triggerPath,
 			string triggerHttpMethod,
 			IRequestValidator requestValidator,
 			JsonSerializerOptions serializationOptions,
 			JsonSerializerOptions deserializationOptions,
 			StatelessServiceContext serviceContext,
-			IDocumentStorageService documentStorageServiceProxy)
-				: base(triggerPath,
+			ServiceProxyPool serviceProxyPool)
+				: base(httpPrefix,
+					triggerPath,
 					triggerHttpMethod,
 					requestValidator,
 					serializationOptions,
 					deserializationOptions,
 					serviceContext)
 		{
-			this.documentStorageServiceProxy = documentStorageServiceProxy;
+			this.serviceProxyPool = serviceProxyPool ?? throw new ArgumentNullException(nameof(serviceProxyPool));
 		}
 
 		/// <inheritdoc/>
@@ -85,7 +88,7 @@ namespace APIGatewayService.Context.Regulation.Documents
 			try
 			{
 				LogInfo($"Received document upload: {deserializedRequestCasted.Title} (bytes={deserializedRequestCasted.FileBytes?.Length ?? 0})");
-				DocumentItemDescriptor uploadedItemDesciptor = await documentStorageServiceProxy.StoreDocument(deserializedRequestCasted);
+				DocumentItemDescriptor uploadedItemDesciptor = await serviceProxyPool.DocumentStorageService.StoreDocument(deserializedRequestCasted);
 
 				if (uploadedItemDesciptor == null)
 				{
@@ -106,24 +109,6 @@ namespace APIGatewayService.Context.Regulation.Documents
 			{
 				LogError("Failed to store document via remoting.", ex);
 				return false;
-			}
-		}
-
-		/// <summary>
-		/// Create s proxy for calling document storage service.
-		/// </summary>
-		/// <returns>Proxy for calling document storage service.</returns>
-		private IDocumentStorageService CreateDocumentStorageServiceProxy()
-		{
-			try
-			{
-				var serviceUri = new Uri("fabric:/RegulationAssistent/DocumentStorageService");
-				return ServiceProxy.Create<IDocumentStorageService>(serviceUri, new ServicePartitionKey(0));
-			}
-			catch (Exception ex)
-			{
-				LogError($"Failed to create proxy of type {nameof(IDocumentStorageService)}.", ex);
-				throw;
 			}
 		}
 	}

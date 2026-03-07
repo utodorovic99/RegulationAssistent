@@ -24,7 +24,8 @@
 
   <Resources>
 	<Endpoints>
-	  <Endpoint Name="ServiceEndpoint" Port="20000" Protocol="tcp" />
+	  <Endpoint Name="ServiceEndpoint" />
+	  <Endpoint Name="V2_1Listener" />
 	  <Endpoint Name="ReplicatorEndpoint" />
 	</Endpoints>
   </Resources>

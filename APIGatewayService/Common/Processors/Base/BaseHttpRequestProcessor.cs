@@ -15,8 +15,9 @@ namespace APIGatewayService.Common.Processors
 	/// an appropriate response based on the regulation logic. It interacts with the service
 	/// context for logging and configuration purposes.
 	/// </summary>
-	internal abstract class BaseHttpRequestProcessor : IRequestProcessor
+	internal abstract class BaseHttpRequestProcessor : IHttpRequestProcessor
 	{
+		protected readonly string httpPrefix;
 		protected readonly string triggerPath;
 		protected readonly string triggerHttpMethod;
 		protected readonly StatelessServiceContext serviceContext;
@@ -29,15 +30,18 @@ namespace APIGatewayService.Common.Processors
 		/// <summary>
 		/// Initializes a new instance of the <see cref="BaseHttpRequestProcessor"/> class with the specified request validator and service context.
 		/// </summary>
+		/// <param name="httpPrefix">HTTP prefix associated with the request.</param>
 		/// <param name="triggerHttpMethod">Method to which processor responds.</param>
 		/// <param name="triggerPath">API path of request.</param>
 		/// <param name="requestValidator">The validator used to validate incoming requests.</param>
 		/// <param name="serviceContext">The Service Fabric context for logging and configuration.</param>
-		public BaseHttpRequestProcessor(string triggerPath,
+		public BaseHttpRequestProcessor(string httpPrefix,
+			string triggerPath,
 			string triggerHttpMethod,
 			IRequestValidator requestValidator,
 			StatelessServiceContext serviceContext)
-			: this(triggerPath,
+			: this(httpPrefix,
+				triggerPath,
 				triggerHttpMethod,
 				requestValidator,
 				CreateDefaultSerializationOptions(),
@@ -49,24 +53,38 @@ namespace APIGatewayService.Common.Processors
 		/// <summary>
 		/// Initializes a new instance of <see cref="BaseHttpRequestProcessor"/>.
 		/// </summary>
+		/// <param name="httpPrefix">HTTP prefix associated with the request.</param>
 		/// <param name="triggerHttpMethod">Method to which processor responds.</param>
 		/// <param name="triggerPath">API path of request.</param>
 		/// <param name="requestValidator">The validator used to validate incoming requests.</param>
 		/// <param name="serializationOptions">The options for serializing responses.</param>
 		/// <param name="deserializationOptions">The options for deserializing requests.</param>
 		/// <param name="serviceContext">The Service Fabric context for logging and configuration.</param>
-		internal BaseHttpRequestProcessor(string triggerPath,
+		internal BaseHttpRequestProcessor(string httpPrefix,
+			string triggerPath,
 			string triggerHttpMethod,
 			IRequestValidator requestValidator,
 			JsonSerializerOptions serializationOptions,
 			JsonSerializerOptions deserializationOptions,
 			StatelessServiceContext serviceContext)
 		{
+			this.httpPrefix = httpPrefix;
+			this.triggerPath = triggerPath;
+			this.triggerHttpMethod = triggerHttpMethod;
 			this.processorName = this.GetType().Name;
 			this.requestValidator = requestValidator;
 			this.serializationOptions = serializationOptions;
 			this.deserializationOptions = deserializationOptions;
 			this.serviceContext = serviceContext;
+		}
+
+		/// <inheritdoc/>
+		public string HttpPrefix
+		{
+			get
+			{
+				return httpPrefix;
+			}
 		}
 
 		/// <inheritdoc/>
@@ -119,7 +137,7 @@ namespace APIGatewayService.Common.Processors
 					errMessage: "Failed to create response.");
 			}
 
-			return await Task.FromResult(HttpProcessResult.Success);
+			return await Task.FromResult(StatusProcessResult.Success);
 		}
 
 		/// <summary>
@@ -128,12 +146,12 @@ namespace APIGatewayService.Common.Processors
 		/// <param name="httpResponse">The HTTP response object.</param>
 		/// <param name="errMessage">The error message to include in the response body.</param>
 		/// <returns>A task representing the asynchronous operation.</returns>
-		protected async Task<HttpProcessResult> HandleFailedResult(HttpListenerResponse httpResponse, string errMessage)
+		protected async Task<StatusProcessResult> HandleFailedResult(HttpListenerResponse httpResponse, string errMessage)
 		{
 			httpResponse.StatusCode = (int)HttpStatusCode.BadRequest;
 			await WriteStringResponseAsync(httpResponse, $"{{\"error\":\"{errMessage}\"}}").ConfigureAwait(false);
 
-			return HttpProcessResult.Failed;
+			return StatusProcessResult.Failed;
 		}
 
 		/// <summary>

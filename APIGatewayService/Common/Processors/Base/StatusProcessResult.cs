@@ -3,32 +3,36 @@
 namespace APIGatewayService.Common
 {
 	/// <summary>
-	/// Processing result for a HTTP request.
+	/// Processing result indicating only a status of the .
 	/// </summary>
-	internal class HttpProcessResult : IProcessingResult
+	internal class StatusProcessResult : IProcessingResult, IEquatable<StatusProcessResult>
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="HttpProcessResult"/>
+		/// Initializes a new instance of the <see cref="StatusProcessResult"/>
 		/// </summary>
 		/// <param name="isSuccessful">Indicator whether processing is successfully executed.</param>
-		private HttpProcessResult(bool isSuccessful)
+		private StatusProcessResult(bool isSuccessful)
 		{
 			IsSuccessful = isSuccessful;
 		}
 
-		/// <summary>
-		/// Gets or sets indicator whether processing is successfully executed.
-		/// </summary>
+		/// <inheritdoc/>
 		public bool IsSuccessful { get; init; }
 
 		/// <summary>
 		/// Cached successful processing result to avoid unnecessary allocations for common successful cases.
 		/// </summary>
-		public static HttpProcessResult Success { get; } = new HttpProcessResult(true);
+		public static StatusProcessResult Success { get; } = new StatusProcessResult(true);
 
 		/// <summary>
 		/// Cached failed processing result to avoid unnecessary allocations for common failure cases.
 		/// </summary>
-		public static HttpProcessResult Failed { get; } = new HttpProcessResult(false);
+		public static StatusProcessResult Failed { get; } = new StatusProcessResult(false);
+
+		/// <inheritdoc/>
+		public bool Equals(StatusProcessResult? other)
+		{
+			return IsSuccessful == other?.IsSuccessful;
+		}
 	}
 }

@@ -43,17 +43,31 @@ namespace RegulationAssistantChatClient.Configuration
 
 				string json = File.ReadAllText(configPath);
 				using JsonDocument doc = JsonDocument.Parse(json);
-				if (doc.RootElement.TryGetProperty("RegulationQueryService", out JsonElement section))
+				
+				string? regulationQueryUrl = null;
+				string? documentStorageUrl = null;
+				
+				if (doc.RootElement.TryGetProperty("RegulationQueryService", out JsonElement regulationQuerySection))
 				{
-					if (section.TryGetProperty("BaseUrl", out JsonElement urlElem) && urlElem.ValueKind == JsonValueKind.String)
+					if (regulationQuerySection.TryGetProperty("BaseUrl", out JsonElement urlElem) && urlElem.ValueKind == JsonValueKind.String)
 					{
-						string? url = urlElem.GetString();
-						if (!string.IsNullOrWhiteSpace(url))
-						{
-							return new AppSettings { RegulationQueryServiceBaseUrl = url };
-						}
+						regulationQueryUrl = urlElem.GetString();
 					}
 				}
+				
+				if (doc.RootElement.TryGetProperty("DocumentStorageService", out JsonElement documentStorageSection))
+				{
+					if (documentStorageSection.TryGetProperty("BaseUrl", out JsonElement urlElem) && urlElem.ValueKind == JsonValueKind.String)
+					{
+						documentStorageUrl = urlElem.GetString();
+					}
+				}
+
+				return new AppSettings 
+				{ 
+					RegulationQueryServiceBaseUrl = regulationQueryUrl ?? "http://localhost:8080/RegulationQuery",
+					DocumentStorageServiceBaseUrl = documentStorageUrl ?? "http://localhost:8080/Documents"
+				};
 			}
 			catch
 			{

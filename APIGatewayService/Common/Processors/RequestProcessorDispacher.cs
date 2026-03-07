@@ -33,18 +33,17 @@ namespace APIGatewayService.Common.Processors
 		}
 
 		/// <inheritdoc/>
-		public void Dispatch(IProcessingObject request, out IProcessingResult result)
+		public async Task<IProcessingResult> DispatchAsync(IProcessingObject request)
 		{
-			result = null;
-
 			foreach (var processor in processors)
 			{
 				if (processor.ShouldProcess(request))
 				{
-					result = processor.ProcessRequestAsync(request).GetAwaiter().GetResult();
-					return;
+					return await processor.ProcessRequestAsync(request);
 				}
 			}
+
+			return StatusProcessResult.Failed;
 		}
 	}
 }

@@ -1,30 +1,36 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace ExternalServiceContracts.Context.Regulation.Documents.Responses
 {
 	/// <summary>
 	/// Gets descriptor for single document.
 	/// </summary>
+	[DataContract]
 	public sealed class DocumentItemDescriptor
 	{
 		/// <summary>
 		/// Gets or sets document title.
 		/// </summary>
+		[DataMember]
 		public string Title { get; set; }
 
 		/// <summary>
 		/// Gets or sets document version number.
 		/// </summary>
+		[DataMember]
 		public int VersionNumber { get; set; }
 
 		/// <summary>
 		/// Gets or sets date from document is considered as valid.
 		/// </summary>
+		[DataMember]
 		public DateTime? ValidFrom { get; set; }
 
 		/// <summary>
 		/// Gets or sets date till document is considered as valid.
 		/// </summary>
+		[DataMember]
 		public DateTime? ValidTo { get; set; }
 
 		/// <inheritdoc/>
