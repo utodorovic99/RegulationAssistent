@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using ExternalServiceContracts.Serialization;
 
 namespace RegulationAssistantChatClient.Configuration
 {
@@ -43,10 +44,10 @@ namespace RegulationAssistantChatClient.Configuration
 
 				string json = File.ReadAllText(configPath);
 				using JsonDocument doc = JsonDocument.Parse(json);
-				
+
 				string? regulationQueryUrl = null;
 				string? documentStorageUrl = null;
-				
+
 				if (doc.RootElement.TryGetProperty("RegulationQueryService", out JsonElement regulationQuerySection))
 				{
 					if (regulationQuerySection.TryGetProperty("BaseUrl", out JsonElement urlElem) && urlElem.ValueKind == JsonValueKind.String)
@@ -54,7 +55,7 @@ namespace RegulationAssistantChatClient.Configuration
 						regulationQueryUrl = urlElem.GetString();
 					}
 				}
-				
+
 				if (doc.RootElement.TryGetProperty("DocumentStorageService", out JsonElement documentStorageSection))
 				{
 					if (documentStorageSection.TryGetProperty("BaseUrl", out JsonElement urlElem) && urlElem.ValueKind == JsonValueKind.String)
@@ -63,8 +64,8 @@ namespace RegulationAssistantChatClient.Configuration
 					}
 				}
 
-				return new AppSettings 
-				{ 
+				return new AppSettings
+				{
 					RegulationQueryServiceBaseUrl = regulationQueryUrl ?? "http://localhost:8080/RegulationQuery",
 					DocumentStorageServiceBaseUrl = documentStorageUrl ?? "http://localhost:8080/Documents"
 				};
@@ -74,6 +75,23 @@ namespace RegulationAssistantChatClient.Configuration
 			}
 
 			return new AppSettings();
+		}
+
+		internal static class JsonOptions
+		{
+			public static JsonSerializerOptions CreateDefaultOptions()
+			{
+				var options = new JsonSerializerOptions
+				{
+					PropertyNameCaseInsensitive = true,
+					PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+				};
+
+				options.Converters.Add(new DateOnlyJsonConverterFactory());
+				options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+
+				return options;
+			}
 		}
 	}
 }

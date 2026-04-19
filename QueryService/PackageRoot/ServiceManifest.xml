@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceManifest Name="QueryServicePkg"
+                 Version="1.0.0"
+                 xmlns="http://schemas.microsoft.com/2011/01/fabric"
+                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ServiceTypes>
+    <!-- This is the name of your ServiceType.
+         This name must match the string used in the RegisterServiceAsync call in Program.cs. -->
+    <StatelessServiceType ServiceTypeName="QueryServiceType" />
+  </ServiceTypes>
+
+  <!-- Code package is your service executable. -->
+  <CodePackage Name="Code" Version="1.0.0">
+    <EntryPoint>
+      <ExeHost>
+        <Program>QueryService.exe</Program>
+      </ExeHost>
+    </EntryPoint>
+  </CodePackage>
+
+  <ConfigPackage Name="Config" Version="1.0.0" />
+
+	<Resources>
+		<Endpoints>
+			<Endpoint Name="ServiceEndpoint" />
+			<Endpoint Name="V2_1Listener" />
+		</Endpoints>
+	</Resources>
+</ServiceManifest>

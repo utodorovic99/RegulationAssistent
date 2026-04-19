@@ -16,13 +16,18 @@ namespace ExternalServiceContracts.Services
 		/// Store a document into a reliable dictionary. Delegates to DocumentPersistenceStorage.
 		/// </summary>
 		/// <param name="request">The document upload request containing the document metadata.</param>
-		Task<DocumentItemDescriptor> StoreDocument(DocumentUploadRequest request);
+		Task<StoreDocumentResponse> StoreDocument(DocumentUploadRequest request);
 
 		/// <summary>
 		/// Retrieves all stored documents.
 		/// </summary>
 		/// <returns>List of all document descriptors.</returns>
 		Task<List<DocumentItemDescriptor>> GetAllDocuments();
+
+		/// <summary>
+		/// Retrieves latest document descriptor for given title, or null if none exists.
+		/// </summary>
+		Task<DocumentItemDescriptor?> GetLatestDocumentByTitle(string title);
 
 		/// <summary>
 		/// Retrieves a specific document's bytes by title and version number.

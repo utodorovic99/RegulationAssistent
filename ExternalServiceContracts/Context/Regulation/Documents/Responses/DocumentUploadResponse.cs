@@ -9,7 +9,7 @@ namespace ExternalServiceContracts.Requests
 	/// Represents the response returned after uploading a document to the API Gateway.
 	/// </summary>
 	[DataContract]
-	public sealed class DocumentUploadResponse : ISerializableResponse
+	public sealed class DocumentUploadResponse : IJsonSerializableResponse
 	{
 		/// <summary>
 		/// Gets or sets the descriptor of the uploaded document.

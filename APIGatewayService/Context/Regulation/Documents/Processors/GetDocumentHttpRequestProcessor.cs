@@ -3,11 +3,11 @@ using System.Net;
 using System.Text.Json;
 using APIGatewayService.Common.Listeners;
 using APIGatewayService.Common.Processors;
-using APIGatewayService.Common.ServiceProxies;
-using APIGatewayService.Context.Common;
 using CommonSDK;
+using CommonSDK.ServiceProxies;
 using ExternalServiceContracts.Context.Regulation.Documents.Requests;
 using ExternalServiceContracts.Context.Regulation.Documents.Responses;
+using ExternalServiceContracts.Services;
 
 namespace APIGatewayService.Context.Regulation.Documents
 {
@@ -16,25 +16,23 @@ namespace APIGatewayService.Context.Regulation.Documents
 	/// </summary>
 	internal sealed class GetDocumentHttpRequestProcessor : BaseHttpRequestProcessor
 	{
-		private readonly ServiceProxyPool serviceProxyPool;
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="GetDocumentHttpRequestProcessor"/> class.
 		/// </summary>
 		/// <param name="serviceContext">Service context.</param>
 		/// <param name="serviceProxyPool">Service proxy pool for accessing service proxies.</param>
-		public GetDocumentHttpRequestProcessor(StatelessServiceContext serviceContext, ServiceProxyPool serviceProxyPool)
+		public GetDocumentHttpRequestProcessor(StatelessServiceContext serviceContext, IRpServiceProxyPool serviceProxyPool)
 			: base(httpPrefix: "Documents",
 				triggerPath: "/Documents/GetDocument",
 				triggerHttpMethod: "POST",
 				new GetDocumentRequestValidator(),
-				serviceContext)
+				serviceContext,
+				serviceProxyPool)
 		{
-			this.serviceProxyPool = serviceProxyPool ?? throw new ArgumentNullException(nameof(serviceProxyPool));
 		}
 
 		/// <inheritdoc/>
-		protected override async Task<ISerializableRequest> ParseRequest(HttpListenerRequest httpRequest)
+		protected override async Task<IJsonSerializableRequest> ParseRequest(HttpListenerRequest httpRequest)
 		{
 			using Stream body = httpRequest.InputStream;
 			GetDocumentRequest? reqParsed = await JsonSerializer.DeserializeAsync<GetDocumentRequest>(body, deserializationOptions).ConfigureAwait(false);
@@ -48,14 +46,14 @@ namespace APIGatewayService.Context.Regulation.Documents
 		}
 
 		/// <inheritdoc/>
-		protected override async Task<bool> TryCreateResponse(ISerializableRequest deserializedRequest, HttpListenerResponse httpResponse)
+		protected override async Task<bool> TryCreateResponse(IJsonSerializableRequest deserializedRequest, HttpListenerResponse httpResponse)
 		{
 			GetDocumentRequest deserializedRequestCasted = (GetDocumentRequest)deserializedRequest;
 
 			try
 			{
 				LogInfo($"Retrieving document: {deserializedRequestCasted.Title} v{deserializedRequestCasted.VersionNumber}");
-				GetDocumentResponse? response = await serviceProxyPool.DocumentStorageService.GetDocument(deserializedRequestCasted);
+				GetDocumentResponse? response = await serviceProxyPool.GetProxy<IDocumentStorageService>().GetDocument(deserializedRequestCasted);
 
 				if (response == null)
 				{

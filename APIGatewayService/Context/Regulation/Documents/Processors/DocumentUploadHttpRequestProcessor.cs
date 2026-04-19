@@ -3,13 +3,13 @@ using System.Net;
 using System.Text.Json;
 using APIGatewayService.Common.Listeners;
 using APIGatewayService.Common.Processors;
-using APIGatewayService.Common.ServiceProxies;
 using APIGatewayService.Context.Common;
 using CommonSDK;
+using CommonSDK.ServiceProxies;
 using ExternalServiceContracts.Context.Regulation.Documents.Responses;
 using ExternalServiceContracts.Requests;
-using Microsoft.ServiceFabric.Services.Client;
-using Microsoft.ServiceFabric.Services.Remoting.Client;
+using ExternalServiceContracts.Services;
+using System.Linq;
 
 namespace APIGatewayService.Context.Regulation.Documents
 {
@@ -18,21 +18,19 @@ namespace APIGatewayService.Context.Regulation.Documents
 	/// </summary>
 	internal sealed class DocumentUploadHttpRequestProcessor : BaseHttpRequestProcessor
 	{
-		private readonly ServiceProxyPool serviceProxyPool;
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DocumentUploadHttpRequestProcessor"/> class.
 		/// </summary>
 		/// <param name="serviceContext">Service context.</param>
 		/// <param name="serviceProxyPool">Service proxy pool for accessing service proxies.</param>
-		public DocumentUploadHttpRequestProcessor(StatelessServiceContext serviceContext, ServiceProxyPool serviceProxyPool)
+		public DocumentUploadHttpRequestProcessor(StatelessServiceContext serviceContext, IRpServiceProxyPool serviceProxyPool)
 			: base(httpPrefix: "Documents",
-				triggerPath: "/Documents/Add",
-				triggerHttpMethod: "POST",
-				new DocumentUploadRequestValidator(),
-				serviceContext)
+					triggerPath: "/Documents/Add",
+					triggerHttpMethod: "POST",
+					new DocumentUploadRequestValidator(serviceContext, serviceProxyPool),
+					serviceContext,
+					serviceProxyPool)
 		{
-			this.serviceProxyPool = serviceProxyPool ?? throw new ArgumentNullException(nameof(serviceProxyPool));
 		}
 
 		/// <summary>
@@ -53,20 +51,20 @@ namespace APIGatewayService.Context.Regulation.Documents
 			JsonSerializerOptions serializationOptions,
 			JsonSerializerOptions deserializationOptions,
 			StatelessServiceContext serviceContext,
-			ServiceProxyPool serviceProxyPool)
+			IRpServiceProxyPool serviceProxyPool)
 				: base(httpPrefix,
 					triggerPath,
 					triggerHttpMethod,
 					requestValidator,
 					serializationOptions,
 					deserializationOptions,
-					serviceContext)
+					serviceContext,
+					serviceProxyPool)
 		{
-			this.serviceProxyPool = serviceProxyPool ?? throw new ArgumentNullException(nameof(serviceProxyPool));
 		}
 
 		/// <inheritdoc/>
-		protected override async Task<ISerializableRequest> ParseRequest(HttpListenerRequest httpRequest)
+		protected override async Task<IJsonSerializableRequest> ParseRequest(HttpListenerRequest httpRequest)
 		{
 			using Stream body = httpRequest.InputStream;
 			DocumentUploadRequest? reqParsed = await JsonSerializer.DeserializeAsync<DocumentUploadRequest>(body, deserializationOptions).ConfigureAwait(false);
@@ -80,7 +78,7 @@ namespace APIGatewayService.Context.Regulation.Documents
 		}
 
 		/// <inheritdoc/>
-		protected override async Task<bool> TryCreateResponse(ISerializableRequest deserializedRequest, HttpListenerResponse httpResponse)
+		protected override async Task<bool> TryCreateResponse(IJsonSerializableRequest deserializedRequest, HttpListenerResponse httpResponse)
 		{
 			DocumentUploadRequest deserializedRequestCasted = (DocumentUploadRequest)deserializedRequest;
 			DocumentUploadResponse deserializedResponse = new DocumentUploadResponse();
@@ -88,13 +86,17 @@ namespace APIGatewayService.Context.Regulation.Documents
 			try
 			{
 				LogInfo($"Received document upload: {deserializedRequestCasted.Title} (bytes={deserializedRequestCasted.FileBytes?.Length ?? 0})");
-				DocumentItemDescriptor uploadedItemDesciptor = await serviceProxyPool.DocumentStorageService.StoreDocument(deserializedRequestCasted);
 
-				if (uploadedItemDesciptor == null)
+				// Call storage service which now returns StoreDocumentResponse
+				StoreDocumentResponse storeResponse = await serviceProxyPool.GetProxy<IDocumentStorageService>().StoreDocument(deserializedRequestCasted);
+
+				if (storeResponse == null || !storeResponse.Success || storeResponse.DocumentDescriptor == null)
 				{
 					LogError("Document storage service failed to store document via remoting.");
 					return false;
 				}
+
+				DocumentItemDescriptor uploadedItemDesciptor = storeResponse.DocumentDescriptor;
 
 				deserializedResponse.DocumentDescriptor = uploadedItemDesciptor;
 

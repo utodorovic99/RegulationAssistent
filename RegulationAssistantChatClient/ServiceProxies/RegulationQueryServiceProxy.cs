@@ -31,11 +31,11 @@ namespace RegulationAssistantChatClient.Services
 
 		/// <summary>
 		/// Sends a <see cref="RegulationQueryRequest"/> to the remote Regulation Query service and
-		/// returns the deserialized <see cref="RegulationQueryResponse"/>.
+		/// returns the deserialized <see cref="RegulationResponse"/>.
 		/// </summary>
 		/// <param name="request">The request to send. The method serializes this object to JSON.</param>
 		/// <returns>
-		/// The deserialized <see cref="RegulationQueryResponse"/> when the call succeeds; otherwise
+		/// The deserialized <see cref="RegulationResponse"/> when the call succeeds; otherwise
 		/// a cached failure response (<see cref="FailedResponsesCached.FailedRegulationQueryResponse"/>)
 		/// when an error occurs.
 		/// </returns>
@@ -44,7 +44,7 @@ namespace RegulationAssistantChatClient.Services
 		/// Any exception during sending or deserialization is caught and results in returning the
 		/// predefined failed response. Callers should treat the returned value accordingly.
 		/// </remarks>
-		public async Task<RegulationQueryResponse> SendRegulationQueryAsync(RegulationQueryRequest request)
+		public async Task<RegulationResponse> SendRegulationQueryAsync(RegulationQueryRequest request)
 		{
 			try
 			{
@@ -58,7 +58,7 @@ namespace RegulationAssistantChatClient.Services
 
 				string responseContent = await response.Content.ReadAsStringAsync();
 
-				RegulationQueryResponse deserializedResponse = JsonSerializer.Deserialize<RegulationQueryResponse>(responseContent);
+				RegulationResponse deserializedResponse = JsonSerializer.Deserialize<RegulationResponse>(responseContent);
 				if (deserializedResponse != null)
 				{
 					return deserializedResponse;
@@ -68,7 +68,7 @@ namespace RegulationAssistantChatClient.Services
 			{
 			}
 
-			return FailedResponsesCached.FailedRegulationQueryResponse;
+			return RegulationResponse.FailedResponse;
 		}
 	}
 }

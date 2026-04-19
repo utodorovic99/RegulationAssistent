@@ -13,6 +13,6 @@ namespace APIGatewayService.Context.Common
 		/// </summary>
 		/// <param name="req">Deserialized request.</param>
 		/// <param name="error">Error code when validation fails.</param>
-		bool TryValidateRequest(ISerializableRequest? req, out string error);
+		bool TryValidateRequest(IJsonSerializableRequest? req, out string error);
 	}
 }

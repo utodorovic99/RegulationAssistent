@@ -6,8 +6,7 @@ using System.Windows.Input;
 namespace RegulationAssistantChatClient.ViewModels
 {
 	/// <summary>
-	/// View model that composes the application's main child view models (<see cref="ChatViewModel"/> and <see cref="OptionsViewModel"/>)
-	/// and forwards selected properties and commands for use by the view's XAML bindings.
+	/// View model that composes the application's main child view models and forwards selected properties and commands for use by the view's XAML bindings.
 	/// </summary>
 	public class MainWindowViewModel : INotifyPropertyChanged
 	{
@@ -17,11 +16,9 @@ namespace RegulationAssistantChatClient.ViewModels
 		/// </summary>
 		public MainWindowViewModel()
 		{
-			OptionsViewModel = new OptionsViewModel();
-			ChatViewModel = new ChatViewModel(OptionsViewModel);
+			ChatViewModel = new ChatViewModel();
 
 			ChatViewModel.PropertyChanged += Child_PropertyChanged;
-			OptionsViewModel.PropertyChanged += Child_PropertyChanged;
 		}
 
 		/// <summary>
@@ -31,26 +28,9 @@ namespace RegulationAssistantChatClient.ViewModels
 		public event PropertyChangedEventHandler? PropertyChanged;
 
 		/// <summary>
-		/// Gets the collection of localized organization type items provided by the <see cref="ChatViewModel"/>,
-		/// usable as the <c>ItemsSource</c> for a ComboBox in the view.
-		/// </summary>
-		public ObservableCollection<OrganizationTypeItem> OrganizationTypes
-		{
-			get
-			{
-				return ChatViewModel.OrganizationTypes;
-			}
-		}
-
-		/// <summary>
 		/// Gets the chat view model which manages chat messages, question input and query-related state.
 		/// </summary>
 		public ChatViewModel ChatViewModel { get; }
-
-		/// <summary>
-		/// Gets the options view model which exposes user-selectable application options such as language and answer style.
-		/// </summary>
-		public OptionsViewModel OptionsViewModel { get; }
 
 		/// <summary>
 		/// Gets the collection of chat messages exposed by the <see cref="ChatViewModel"/>.
@@ -104,38 +84,6 @@ namespace RegulationAssistantChatClient.ViewModels
 		}
 
 		/// <summary>
-		/// Gets or sets the currently selected language name via the <see cref="OptionsViewModel"/>.
-		/// </summary>
-		public string Language
-		{
-			get
-			{
-				return OptionsViewModel.Language;
-			}
-
-			set
-			{
-				OptionsViewModel.Language = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the user's selected response type label via the <see cref="OptionsViewModel"/>.
-		/// </summary>
-		public string ResponseType
-		{
-			get
-			{
-				return OptionsViewModel.ResponseType;
-			}
-
-			set
-			{
-				OptionsViewModel.ResponseType = value;
-			}
-		}
-
-		/// <summary>
 		/// Gets or sets the selected date used for regulation queries. This is forwarded to the <see cref="ChatViewModel"/>.
 		/// </summary>
 		public DateTime? SelectedDate
@@ -148,22 +96,6 @@ namespace RegulationAssistantChatClient.ViewModels
 			set
 			{
 				ChatViewModel.SelectedDate = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the selected organization type (enum name as string). This value is forwarded to the <see cref="ChatViewModel"/>.
-		/// </summary>
-		public string SelectedOrganizationTypeString
-		{
-			get
-			{
-				return ChatViewModel.SelectedOrganizationTypeString;
-			}
-
-			set
-			{
-				ChatViewModel.SelectedOrganizationTypeString = value;
 			}
 		}
 

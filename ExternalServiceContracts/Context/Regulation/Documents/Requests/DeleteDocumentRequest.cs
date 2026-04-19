@@ -8,7 +8,7 @@ namespace ExternalServiceContracts.Context.Regulation.Documents.Requests
 	/// Request to delete a specific document by title and version.
 	/// </summary>
 	[DataContract]
-	public sealed class DeleteDocumentRequest : ISerializableRequest
+	public sealed class DeleteDocumentRequest : IJsonSerializableRequest
 	{
 		/// <summary>
 		/// Gets or sets the title of the document to delete.

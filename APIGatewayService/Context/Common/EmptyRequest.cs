@@ -5,7 +5,7 @@ namespace APIGatewayService.Context.Common
 	/// <summary>
 	/// Represents an empty request used for GET operations that don't require a request body.
 	/// </summary>
-	internal sealed class EmptyRequest : ISerializableRequest
+	internal sealed class EmptyRequest : IJsonSerializableRequest
 	{
 	}
 }

@@ -1,8 +1,10 @@
 using System.Fabric;
 using APIGatewayService.Common.Listeners;
-using APIGatewayService.Common.ServiceProxies;
+using APIGatewayService.Context.Common;
 using APIGatewayService.Context.Regulation.Documents;
 using APIGatewayService.Context.Regulation.RegulationQuery.Requests;
+using CommonSDK.ServiceProxies;
+using ExternalServiceContracts.Services;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 
@@ -13,7 +15,7 @@ namespace APIGatewayService
 	/// </summary>
 	internal sealed class APIGatewayService : StatelessService
 	{
-		private readonly ServiceProxyPool serviceProxyPool;
+		private readonly IRpServiceProxyPool serviceProxyPool;
 
 		/// <summary>
 		/// Creates a new instance of <see cref="APIGatewayService"/>.
@@ -22,7 +24,15 @@ namespace APIGatewayService
 		public APIGatewayService(StatelessServiceContext context)
 			: base(context)
 		{
-			serviceProxyPool = new ServiceProxyPool();
+			serviceProxyPool = new RpServiceProxyPool();
+		}
+
+		protected override Task RunAsync(CancellationToken cancellationToken)
+		{
+			serviceProxyPool.RegisterFabricRP2Proxy<IDocumentStorageService>("fabric:/RegulationAssistent/DocumentStorageService", ServiceType.Stateful);
+			serviceProxyPool.RegisterFabricRP2Proxy<IRegulationQuery>("fabric:/RegulationAssistent/QueryService", ServiceType.Stateless);
+
+			return base.RunAsync(cancellationToken);
 		}
 
 		/// <summary>
@@ -31,20 +41,21 @@ namespace APIGatewayService
 		/// <returns>A collection of listeners.</returns>
 		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
 		{
-			return
-			[
+			return new ServiceInstanceListener[1]
+			{
 				new ServiceInstanceListener(serviceContext =>
-					new HttpListenerWrapper(serviceContext,
+					new HttpListenerWrapper(
+						serviceContext,
 						endpointName: "ServiceEndpoint",
-						requestProcessors:
-						[
-							new RegulationQueryHttpRequestProcessor(serviceContext),
+						requestProcessors: new IHttpRequestProcessor[]
+						{
+							new RegulationQueryHttpRequestProcessor(serviceContext, serviceProxyPool),
 							new DocumentUploadHttpRequestProcessor(serviceContext, serviceProxyPool),
 							new GetDocumentsHttpRequestProcessor(serviceContext, serviceProxyPool),
 							new GetDocumentHttpRequestProcessor(serviceContext, serviceProxyPool),
 							new DeleteDocumentHttpRequestProcessor(serviceContext, serviceProxyPool)
-						]))
-			];
+						}))
+			};
 		}
 	}
 }

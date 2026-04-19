@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 
 namespace ExternalServiceContracts.Requests
 {
@@ -14,24 +13,11 @@ namespace ExternalServiceContracts.Requests
 		public DateOnly Date { get; init; } = default;
 
 		/// <summary>
-		/// Gets type of organization making the query.
+		/// Validates the RegulationQueryContext instance.
 		/// </summary>
-		public OrganizationType OrganizationType { get; init; } = OrganizationType.Other;
-
-		/// <inheritdoc/>
-		public override string ToString()
+		public bool IsValid()
 		{
-			StringBuilder sb = new StringBuilder();
-			AppendSelfAsString(sb);
-
-			return sb.ToString();
-		}
-
-		/// <inheritdoc/>
-		public void AppendSelfAsString(StringBuilder sb)
-		{
-			sb.AppendLine($"Date: {Date}");
-			sb.AppendLine($"Organization Type: {OrganizationType}");
+			return Date == default;
 		}
 	}
 }

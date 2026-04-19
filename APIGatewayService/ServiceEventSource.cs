@@ -1,118 +1,101 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Fabric;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace APIGatewayService
 {
-	/// <summary>
-	/// EventSource implementation for structured logging and diagnostics used by the service.
-	/// </summary>
-	[EventSource(Name = "MyCompany-RegulationAssistent-APIGatewayService")]
-	internal sealed class ServiceEventSource : EventSource
-	{
-		public static readonly ServiceEventSource Current = new ServiceEventSource();
+    [EventSource(Name = "MyCompany-RegulationAssistent-APIGatewayService")]
+internal sealed class ServiceEventSource : EventSource
+{
+    public static readonly ServiceEventSource Current = new ServiceEventSource();
 
-		/// <summary>
-		/// Event keyword definitions used to categorize events.
-		/// </summary>
-		public static class Keywords
-		{
-			public const EventKeywords Requests = (EventKeywords)0x1L;
-			public const EventKeywords ServiceInitialization = (EventKeywords)0x2L;
-		}
+    // Instance constructor is private to enforce singleton semantics
+    private ServiceEventSource() : base() { }
 
-		private const int MessageEventId = 1;
-		private const int ServiceMessageEventId = 2;
-		private const int ServiceTypeRegisteredEventId = 3;
-		private const int ServiceHostInitializationFailedEventId = 4;
-		private const int ServiceRequestStartEventId = 5;
-		private const int ServiceRequestStopEventId = 6;
+    #region Keywords
+    // Event keywords can be used to categorize events. 
+    // Each keyword is a bit flag. A single event can be associated with multiple keywords (via EventAttribute.Keywords property).
+    // Keywords must be defined as a public class named 'Keywords' inside EventSource that uses them.
+    public static class Keywords
+    {
+        public const EventKeywords Requests = (EventKeywords)0x1L;
+        public const EventKeywords ServiceInitialization = (EventKeywords)0x2L;
+    }
+    #endregion
 
-		// Instance constructor is private to enforce singleton semantics
-		private ServiceEventSource()
-			: base()
-		{
-		}
+    #region Events
+    // Define an instance method for each event you want to record and apply an [Event] attribute to it.
+    // The method name is the name of the event.
+    // Pass any parameters you want to record with the event (only primitive integer types, DateTime, Guid & string are allowed).
+    // Each event method implementation should check whether the event source is enabled, and if it is, call WriteEvent() method to raise the event.
+    // The number and types of arguments passed to every event method must exactly match what is passed to WriteEvent().
+    // Put [NonEvent] attribute on all methods that do not define an event.
+    // For more information see https://msdn.microsoft.com/en-us/library/system.diagnostics.tracing.eventsource.aspx
 
-		/// <summary>
-		/// Writes a formatted informational message. This overload accepts a format and arguments.
-		/// </summary>
-		/// <param name="message">Format string.</param>
-		/// <param name="args">Format arguments.</param>
-		[NonEvent]
-		public void Message(string message, params object[] args)
-		{
-			if (this.IsEnabled())
-			{
-				string finalMessage = string.Format(message, args);
-				Message(finalMessage);
-			}
-		}
+    [NonEvent]
+    public void Message(string message, params object[] args)
+    {
+        if (this.IsEnabled())
+        {
+            string finalMessage = string.Format(message, args);
+            Message(finalMessage);
+        }
+    }
 
-		/// <summary>
-		/// Writes a simple informational message event.
-		/// </summary>
-		/// <param name="message">Message to write.</param>
-		[Event(MessageEventId, Level = EventLevel.Informational, Message = "{0}")]
-		public void Message(string message)
-		{
-			if (this.IsEnabled())
-			{
-				WriteEvent(MessageEventId, message);
-			}
-		}
+    private const int MessageEventId = 1;
+    [Event(MessageEventId, Level = EventLevel.Informational, Message = "{0}")]
+    public void Message(string message)
+    {
+        if (this.IsEnabled())
+        {
+            WriteEvent(MessageEventId, message);
+        }
+    }
 
-		/// <summary>
-		/// Writes a service-scoped message that includes service and application metadata.
-		/// </summary>
-		/// <param name="serviceContext">Stateless service context for metadata.</param>
-		/// <param name="message">Format string.</param>
-		/// <param name="args">Format arguments.</param>
-		[NonEvent]
-		public void ServiceMessage(StatelessServiceContext serviceContext, string message, params object[] args)
-		{
-			if (this.IsEnabled())
-			{
-				string finalMessage = string.Format(message, args);
-				ServiceMessage(
-					serviceContext.ServiceName.ToString(),
-					serviceContext.ServiceTypeName,
-					serviceContext.InstanceId,
-					serviceContext.PartitionId,
-					serviceContext.CodePackageActivationContext.ApplicationName,
-					serviceContext.CodePackageActivationContext.ApplicationTypeName,
-					serviceContext.NodeContext.NodeName,
-					finalMessage);
-			}
-		}
+    [NonEvent]
+    public void ServiceMessage(StatelessServiceContext serviceContext, string message, params object[] args)
+    {
+        if (this.IsEnabled())
+        {
+            string finalMessage = string.Format(message, args);
+            ServiceMessage(
+                serviceContext.ServiceName.ToString(),
+                serviceContext.ServiceTypeName,
+                serviceContext.InstanceId,
+                serviceContext.PartitionId,
+                serviceContext.CodePackageActivationContext.ApplicationName,
+                serviceContext.CodePackageActivationContext.ApplicationTypeName,
+                serviceContext.NodeContext.NodeName,
+                finalMessage);
+        }
+    }
 
-		/// <summary>
-		/// Writes a detailed service message event including metadata and message text.
-		/// </summary>
-		/// <param name="serviceName">Service name.</param>
-		/// <param name="serviceTypeName">Service type name.</param>
-		/// <param name="replicaOrInstanceId">Instance id.</param>
-		/// <param name="partitionId">Partition id.</param>
-		/// <param name="applicationName">Application name.</param>
-		/// <param name="applicationTypeName">Application type name.</param>
-		/// <param name="nodeName">Node name.</param>
-		/// <param name="message">Message text.</param>
-		[Event(ServiceMessageEventId, Level = EventLevel.Informational, Message = "{7}")]
-		private
+    // For very high-frequency events it might be advantageous to raise events using WriteEventCore API.
+    // This results in more efficient parameter handling, but requires explicit allocation of EventData structure and unsafe code.
+    // To enable this code path, define UNSAFE conditional compilation symbol and turn on unsafe code support in project properties.
+    private const int ServiceMessageEventId = 2;
+    [Event(ServiceMessageEventId, Level = EventLevel.Informational, Message = "{7}")]
+    private
 #if UNSAFE
         unsafe
 #endif
-			void ServiceMessage(
-			string serviceName,
-			string serviceTypeName,
-			long replicaOrInstanceId,
-			Guid partitionId,
-			string applicationName,
-			string applicationTypeName,
-			string nodeName,
-			string message)
-		{
+        void ServiceMessage(
+        string serviceName,
+        string serviceTypeName,
+        long replicaOrInstanceId,
+        Guid partitionId,
+        string applicationName,
+        string applicationTypeName,
+        string nodeName,
+        string message)
+    {
 #if !UNSAFE
-			WriteEvent(ServiceMessageEventId, serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName, applicationTypeName, nodeName, message);
+        WriteEvent(ServiceMessageEventId, serviceName, serviceTypeName, replicaOrInstanceId, partitionId, applicationName, applicationTypeName, nodeName, message);
 #else
             const int numArgs = 8;
             fixed (char* pServiceName = serviceName, pServiceTypeName = serviceTypeName, pApplicationName = applicationName, pApplicationTypeName = applicationTypeName, pNodeName = nodeName, pMessage = message)
@@ -130,54 +113,42 @@ namespace APIGatewayService
                 WriteEventCore(ServiceMessageEventId, numArgs, eventData);
             }
 #endif
-		}
+    }
 
-		/// <summary>
-		/// Emits an event indicating that a service type was registered.
-		/// </summary>
-		/// <param name="hostProcessId">Host process id.</param>
-		/// <param name="serviceType">Service type name.</param>
-		[Event(ServiceTypeRegisteredEventId, Level = EventLevel.Informational, Message = "Service host process {0} registered service type {1}", Keywords = Keywords.ServiceInitialization)]
-		public void ServiceTypeRegistered(int hostProcessId, string serviceType)
-		{
-			WriteEvent(ServiceTypeRegisteredEventId, hostProcessId, serviceType);
-		}
+    private const int ServiceTypeRegisteredEventId = 3;
+    [Event(ServiceTypeRegisteredEventId, Level = EventLevel.Informational, Message = "Service host process {0} registered service type {1}", Keywords = Keywords.ServiceInitialization)]
+    public void ServiceTypeRegistered(int hostProcessId, string serviceType)
+    {
+        WriteEvent(ServiceTypeRegisteredEventId, hostProcessId, serviceType);
+    }
 
-		/// <summary>
-		/// Emits an event when service host initialization fails.
-		/// </summary>
-		/// <param name="exception">Exception text.</param>
-		[Event(ServiceHostInitializationFailedEventId, Level = EventLevel.Error, Message = "Service host initialization failed", Keywords = Keywords.ServiceInitialization)]
-		public void ServiceHostInitializationFailed(string exception)
-		{
-			WriteEvent(ServiceHostInitializationFailedEventId, exception);
-		}
+    private const int ServiceHostInitializationFailedEventId = 4;
+    [Event(ServiceHostInitializationFailedEventId, Level = EventLevel.Error, Message = "Service host initialization failed", Keywords = Keywords.ServiceInitialization)]
+    public void ServiceHostInitializationFailed(string exception)
+    {
+        WriteEvent(ServiceHostInitializationFailedEventId, exception);
+    }
 
-		/// <summary>
-		/// Marks the start of a service request activity.
-		/// </summary>
-		/// <param name="requestTypeName">Request type name.</param>
-		[Event(ServiceRequestStartEventId, Level = EventLevel.Informational, Message = "Service request '{0}' started", Keywords = Keywords.Requests)]
-		public void ServiceRequestStart(string requestTypeName)
-		{
-			WriteEvent(ServiceRequestStartEventId, requestTypeName);
-		}
+    // A pair of events sharing the same name prefix with a "Start"/"Stop" suffix implicitly marks boundaries of an event tracing activity.
+    // These activities can be automatically picked up by debugging and profiling tools, which can compute their execution time, child activities,
+    // and other statistics.
+    private const int ServiceRequestStartEventId = 5;
+    [Event(ServiceRequestStartEventId, Level = EventLevel.Informational, Message = "Service request '{0}' started", Keywords = Keywords.Requests)]
+    public void ServiceRequestStart(string requestTypeName)
+    {
+        WriteEvent(ServiceRequestStartEventId, requestTypeName);
+    }
 
-		/// <summary>
-		/// Marks the stop of a service request activity.
-		/// </summary>
-		/// <param name="requestTypeName">Request type name.</param>
-		/// <param name="exception">Optional exception text if an error occurred.</param>
-		[Event(ServiceRequestStopEventId, Level = EventLevel.Informational, Message = "Service request '{0}' finished", Keywords = Keywords.Requests)]
-		public void ServiceRequestStop(string requestTypeName, string exception = "")
-		{
-			WriteEvent(ServiceRequestStopEventId, requestTypeName, exception);
-		}
+    private const int ServiceRequestStopEventId = 6;
+    [Event(ServiceRequestStopEventId, Level = EventLevel.Informational, Message = "Service request '{0}' finished", Keywords = Keywords.Requests)]
+    public void ServiceRequestStop(string requestTypeName, string exception = "")
+    {
+        WriteEvent(ServiceRequestStopEventId, requestTypeName, exception);
+    }
+    #endregion
 
+    #region Private methods
 #if UNSAFE
-        /// <summary>
-        /// Helper to compute string size in bytes for unsafe WriteEventCore usage.
-        /// </summary>
         private int SizeInBytes(string s)
         {
             if (s == null)
@@ -190,5 +161,6 @@ namespace APIGatewayService
             }
         }
 #endif
-	}
+    #endregion
+}
 }

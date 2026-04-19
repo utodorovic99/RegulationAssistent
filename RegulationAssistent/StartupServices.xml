@@ -1,6 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <StartupServicesManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
+    <Parameter Name="LLMService_MinReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="LLMService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="LLMService_TargetReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="QueryService_InstanceCount" DefaultValue="1" />
+    <Parameter Name="DocumentIndexingService_MinReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="DocumentIndexingService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="DocumentIndexingService_TargetReplicaSetSize" DefaultValue="1" />
     <Parameter Name="DocumentStorageService_MinReplicaSetSize" DefaultValue="1" />
     <Parameter Name="DocumentStorageService_PartitionCount" DefaultValue="1" />
     <Parameter Name="DocumentStorageService_TargetReplicaSetSize" DefaultValue="1" />
@@ -12,6 +19,21 @@
          ServiceFabric PowerShell module.
 
          The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
+    <Service Name="LLMService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="LLMServiceType" TargetReplicaSetSize="[LLMService_TargetReplicaSetSize]" MinReplicaSetSize="[LLMService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[LLMService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="QueryService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="QueryServiceType" InstanceCount="[QueryService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="DocumentIndexingService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="DocumentIndexingServiceType" TargetReplicaSetSize="[DocumentIndexingService_TargetReplicaSetSize]" MinReplicaSetSize="[DocumentIndexingService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[DocumentIndexingService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
     <Service Name="DocumentStorageService" ServicePackageActivationMode="ExclusiveProcess">
       <StatefulService ServiceTypeName="DocumentStorageServiceType" TargetReplicaSetSize="[DocumentStorageService_TargetReplicaSetSize]" MinReplicaSetSize="[DocumentStorageService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[DocumentStorageService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />

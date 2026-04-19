@@ -9,7 +9,7 @@ namespace RegulationAssistantChatClient.Properties
 	/// Strongly-typed resource class for accessing localized strings.
 	/// Provides access to the resource manager and culture override for lookups.
 	/// </summary>
-	internal static class Resources
+	public static class Resources
 	{
 		/// <summary>
 		/// Backing field for the <see cref="ResourceManager"/> instance.
@@ -27,7 +27,7 @@ namespace RegulationAssistantChatClient.Properties
 		/// Returns the cached <see cref="ResourceManager"/> instance, creating it if necessary.
 		/// The manager is used to retrieve localized resources from the assembly.
 		/// </summary>
-		internal static ResourceManager ResourceManager
+		public static ResourceManager ResourceManager
 		{
 			get
 			{
@@ -44,50 +44,125 @@ namespace RegulationAssistantChatClient.Properties
 		/// Overrides the current thread's <see cref="CultureInfo.CurrentUICulture"/> for all resource lookups using this strongly typed resource class.
 		/// Set this property to force resource lookups to use a specific culture.
 		/// </summary>
-		internal static CultureInfo Culture
+		public static CultureInfo Culture
 		{
-			get
-			{
-				return resourceCulture;
-			}
-
-			set
-			{
-				resourceCulture = value;
-			}
+			get { return resourceCulture; }
+			set { resourceCulture = value; }
 		}
 
 		/// <summary>
 		/// Gets the localized value for the "WelcomeMessage" resource key.
 		/// </summary>
-		internal static string WelcomeMessage
-		{
-			get
-			{
-				return ResourceManager.GetString("WelcomeMessage", resourceCulture);
-			}
-		}
+		public static string WelcomeMessage => ResourceManager.GetString("WelcomeMessage", resourceCulture);
 
 		/// <summary>
 		/// Gets the localized value for the "SendButton" resource key.
 		/// </summary>
-		internal static string SendButton
-		{
-			get
-			{
-				return ResourceManager.GetString("SendButton", resourceCulture);
-			}
-		}
+		public static string SendButton => ResourceManager.GetString("SendButton", resourceCulture);
 
 		/// <summary>
 		/// Gets the localized value for the "ClearButton" resource key.
 		/// </summary>
-		internal static string ClearButton
-		{
-			get
-			{
-				return ResourceManager.GetString("ClearButton", resourceCulture);
-			}
-		}
+		public static string ClearButton => ResourceManager.GetString("ClearButton", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "DateLabel" resource key.
+		/// </summary>
+		public static string DateLabel => ResourceManager.GetString("DateLabel", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "Documents_TitleHeader" resource key.
+		/// </summary>
+		public static string Documents_TitleHeader => ResourceManager.GetString("Documents_TitleHeader", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "Documents_VersionHeader" resource key.
+		/// </summary>
+		public static string Documents_VersionHeader => ResourceManager.GetString("Documents_VersionHeader", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "Documents_ValidFromHeader" resource key.
+		/// </summary>
+		public static string Documents_ValidFromHeader => ResourceManager.GetString("Documents_ValidFromHeader", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "Documents_ValidToHeader" resource key.
+		/// </summary>
+		public static string Documents_ValidToHeader => ResourceManager.GetString("Documents_ValidToHeader", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "NewButton" resource key.
+		/// </summary>
+		public static string NewButton => ResourceManager.GetString("NewButton", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "UploadButton" resource key.
+		/// </summary>
+		public static string UploadButton => ResourceManager.GetString("UploadButton", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "EditButton" resource key.
+		/// </summary>
+		public static string EditButton => ResourceManager.GetString("EditButton", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "DeleteButton" resource key.
+		/// </summary>
+		public static string DeleteButton => ResourceManager.GetString("DeleteButton", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "DocumentTitle_Prompt" resource key.
+		/// </summary>
+		public static string DocumentTitle_Prompt => ResourceManager.GetString("DocumentTitle_Prompt", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "DocumentTitle_Save" resource key.
+		/// </summary>
+		public static string DocumentTitle_Save => ResourceManager.GetString("DocumentTitle_Save", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "DocumentTitle_Cancel" resource key.
+		/// </summary>
+		public static string DocumentTitle_Cancel => ResourceManager.GetString("DocumentTitle_Cancel", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "DocumentTitle_Required" resource key.
+		/// </summary>
+		public static string DocumentTitle_Required => ResourceManager.GetString("DocumentTitle_Required", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "Upload_Failed" resource key.
+		/// </summary>
+		public static string Upload_Failed => ResourceManager.GetString("Upload_Failed", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "Upload_ErrorTitle" resource key.
+		/// </summary>
+		public static string Upload_ErrorTitle => ResourceManager.GetString("Upload_ErrorTitle", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "Upload_ErrorDetail" resource key.
+		/// </summary>
+		public static string Upload_ErrorDetail => ResourceManager.GetString("Upload_ErrorDetail", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "DocumentNotFound_Title" resource key.
+		/// </summary>
+		public static string DocumentNotFound_Title => ResourceManager.GetString("DocumentNotFound_Title", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "DocumentNotFound_Message" resource key.
+		/// </summary>
+		public static string DocumentNotFound_Message => ResourceManager.GetString("DocumentNotFound_Message", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "SaveChanges_Prompt" resource key.
+		/// </summary>
+		public static string SaveChanges_Prompt => ResourceManager.GetString("SaveChanges_Prompt", resourceCulture);
+
+		/// <summary>
+		/// Gets the localized value for the "SaveChanges_Title" resource key.
+		/// </summary>
+		public static string SaveChanges_Title => ResourceManager.GetString("SaveChanges_Title", resourceCulture);
 	}
 }

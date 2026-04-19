@@ -9,7 +9,7 @@ namespace ExternalServiceContracts.Requests
 	/// Request DTO used to upload a document to the API Gateway.
 	/// </summary>
 	[DataContract]
-	public sealed class DocumentUploadRequest : ISerializableRequest
+	public sealed class DocumentUploadRequest : IJsonSerializableRequest
 	{
 		/// <summary>
 		/// Gets or sets uploaded title.
@@ -23,14 +23,14 @@ namespace ExternalServiceContracts.Requests
 		/// </summary>
 		[JsonPropertyName("validFrom")]
 		[DataMember]
-		public DateTime? ValidFrom { get; set; }
+		public DateOnly ValidFrom { get; set; }
 
 		/// <summary>
-		/// Gets or sets date till document is valid.
+		/// Gets or sets date till document is valid. Nullable when document has no end date.
 		/// </summary>
 		[JsonPropertyName("validTo")]
 		[DataMember]
-		public DateTime? ValidTo { get; set; }
+		public DateOnly? ValidTo { get; set; }
 
 		/// <summary>
 		/// Gets or sets document file bytes.
@@ -38,5 +38,12 @@ namespace ExternalServiceContracts.Requests
 		[JsonPropertyName("fileBytes")]
 		[DataMember]
 		public byte[] FileBytes { get; set; } = Array.Empty<byte>();
+
+		/// <summary>
+		/// Document format (docx by default)
+		/// </summary>
+		[JsonPropertyName("format")]
+		[DataMember]
+		public DocumentFormat Format { get; set; } = DocumentFormat.Docx;
 	}
 }

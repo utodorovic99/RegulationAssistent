@@ -5,7 +5,6 @@
 	/// </summary>
 	internal interface IProcessingResult
 	{
-
 		/// <summary>
 		/// Gets indicator whether processing is successfully executed.
 		/// </summary>

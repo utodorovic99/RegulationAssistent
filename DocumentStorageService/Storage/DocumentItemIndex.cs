@@ -21,16 +21,16 @@ namespace DocumentStorageService.Storage
 		public int VersionNumber { get; set; }
 
 		/// <summary>
-		/// Gets or sets the date and time when the document item becomes valid.
+		/// Gets or sets the date when the document item becomes valid.
 		/// </summary>
 		[DataMember]
-		public DateTime? ValidFrom { get; set; }
+		public DateOnly ValidFrom { get; set; }
 
 		/// <summary>
-		/// Gets or sets the date and time when the document item stops being valid.
+		/// Gets or sets the date when the document item stops being valid. Nullable when no explicit end date is specified.
 		/// </summary>
 		[DataMember]
-		public DateTime? ValidTo { get; set; }
+		public DateOnly? ValidTo { get; set; }
 
 		/// <summary>
 		/// Gets or sets the URI of the blob storage where the document item is stored.

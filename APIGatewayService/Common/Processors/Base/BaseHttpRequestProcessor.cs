@@ -6,6 +6,8 @@ using System.Text.Json.Serialization;
 using APIGatewayService.Common.Listeners;
 using APIGatewayService.Context.Common;
 using CommonSDK;
+using CommonSDK.ServiceProxies;
+using ExternalServiceContracts.Serialization;
 
 namespace APIGatewayService.Common.Processors
 {
@@ -23,6 +25,7 @@ namespace APIGatewayService.Common.Processors
 		protected readonly StatelessServiceContext serviceContext;
 		protected readonly JsonSerializerOptions serializationOptions;
 		protected readonly JsonSerializerOptions deserializationOptions;
+		protected readonly IRpServiceProxyPool serviceProxyPool;
 
 		private readonly string processorName;
 		private readonly IRequestValidator requestValidator;
@@ -35,18 +38,21 @@ namespace APIGatewayService.Common.Processors
 		/// <param name="triggerPath">API path of request.</param>
 		/// <param name="requestValidator">The validator used to validate incoming requests.</param>
 		/// <param name="serviceContext">The Service Fabric context for logging and configuration.</param>
+		/// /// <param name="proxyPool">Service proxy pool.</param>
 		public BaseHttpRequestProcessor(string httpPrefix,
 			string triggerPath,
 			string triggerHttpMethod,
 			IRequestValidator requestValidator,
-			StatelessServiceContext serviceContext)
+			StatelessServiceContext serviceContext,
+			IRpServiceProxyPool proxyPool)
 			: this(httpPrefix,
 				triggerPath,
 				triggerHttpMethod,
 				requestValidator,
 				CreateDefaultSerializationOptions(),
 				CreateDefaultDeserializationOptions(),
-				serviceContext)
+				serviceContext,
+				proxyPool)
 		{
 		}
 
@@ -60,13 +66,15 @@ namespace APIGatewayService.Common.Processors
 		/// <param name="serializationOptions">The options for serializing responses.</param>
 		/// <param name="deserializationOptions">The options for deserializing requests.</param>
 		/// <param name="serviceContext">The Service Fabric context for logging and configuration.</param>
+		/// <param name="proxyPool">Service proxy pool.</param>
 		internal BaseHttpRequestProcessor(string httpPrefix,
 			string triggerPath,
 			string triggerHttpMethod,
 			IRequestValidator requestValidator,
 			JsonSerializerOptions serializationOptions,
 			JsonSerializerOptions deserializationOptions,
-			StatelessServiceContext serviceContext)
+			StatelessServiceContext serviceContext,
+			IRpServiceProxyPool proxyPool)
 		{
 			this.httpPrefix = httpPrefix;
 			this.triggerPath = triggerPath;
@@ -76,6 +84,7 @@ namespace APIGatewayService.Common.Processors
 			this.serializationOptions = serializationOptions;
 			this.deserializationOptions = deserializationOptions;
 			this.serviceContext = serviceContext;
+			this.serviceProxyPool = proxyPool;
 		}
 
 		/// <inheritdoc/>
@@ -102,7 +111,7 @@ namespace APIGatewayService.Common.Processors
 		{
 			HttpProcessObject processObjectCasted = (HttpProcessObject)processObject;
 
-			ISerializableRequest deserializedRequest;
+			IJsonSerializableRequest deserializedRequest;
 			try
 			{
 				deserializedRequest = await ParseRequest(processObjectCasted.Request);
@@ -186,7 +195,7 @@ namespace APIGatewayService.Common.Processors
 		/// <param name="httpRequest">The HTTP request object.</param>
 		/// <returns>The deserialized request object.</returns>
 		/// <exception cref="NullReferenceException">Thrown if deserialization fails.</exception>
-		protected abstract Task<ISerializableRequest> ParseRequest(HttpListenerRequest httpRequest);
+		protected abstract Task<IJsonSerializableRequest> ParseRequest(HttpListenerRequest httpRequest);
 
 		/// <summary>
 		/// Creates response.
@@ -194,7 +203,7 @@ namespace APIGatewayService.Common.Processors
 		/// <param name="deserializedRequest">Deserialized request.</param>
 		/// <param name="httpResponse">HTTP response where deserialized response will be stored.</param>
 		/// <returns><c>True</c> if response is successfully created. Otherwise returns <c>false</c>.</returns>
-		protected abstract Task<bool> TryCreateResponse(ISerializableRequest deserializedRequest, HttpListenerResponse httpResponse);
+		protected abstract Task<bool> TryCreateResponse(IJsonSerializableRequest deserializedRequest, HttpListenerResponse httpResponse);
 
 		/// <summary>
 		/// Creates and configures default options for deserializing JSON requests.
@@ -208,6 +217,8 @@ namespace APIGatewayService.Common.Processors
 			};
 
 			options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+			// Ensure DateOnly is (de)serialized consistently
+			options.Converters.Add(new DateOnlyJsonConverterFactory());
 
 			return options;
 		}
@@ -218,10 +229,15 @@ namespace APIGatewayService.Common.Processors
 		/// <returns>A configured <see cref="JsonSerializerOptions"/> instance.</returns>
 		protected static JsonSerializerOptions CreateDefaultSerializationOptions()
 		{
-			return new JsonSerializerOptions
+			var options = new JsonSerializerOptions
 			{
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 			};
+
+			// Ensure DateOnly is serialized consistently
+			options.Converters.Add(new DateOnlyJsonConverterFactory());
+
+			return options;
 		}
 
 		/// <summary>

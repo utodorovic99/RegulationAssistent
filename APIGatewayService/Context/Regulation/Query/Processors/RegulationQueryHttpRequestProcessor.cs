@@ -6,9 +6,10 @@ using APIGatewayService.Common.Processors;
 using APIGatewayService.Context.Common;
 using APIGatewayService.Context.RegulationQuery;
 using CommonSDK;
-using ExternalServiceContracts.Common;
+using CommonSDK.ServiceProxies;
 using ExternalServiceContracts.Requests;
 using ExternalServiceContracts.Responses;
+using ExternalServiceContracts.Services;
 
 namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 {
@@ -17,16 +18,20 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 	/// </summary>
 	internal sealed class RegulationQueryHttpRequestProcessor : BaseHttpRequestProcessor
 	{
+		private static readonly string failedResponse = "Server was unable to provide response.";
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RegulationQueryHttpRequestProcessor"/> class with the specified service context and a default request validator.
 		/// </summary>
 		/// <param name="serviceContext">Service context.</param>
-		public RegulationQueryHttpRequestProcessor(StatelessServiceContext serviceContext)
+		/// <param name="serviceProxyPool">Service proxy pool.</param>
+		public RegulationQueryHttpRequestProcessor(StatelessServiceContext serviceContext, IRpServiceProxyPool serviceProxyPool)
 			: base(httpPrefix: "RegulationQuery",
 				triggerPath: "/RegulationQuery/Submit",
 				triggerHttpMethod: "POST",
 				new RegulationQueryRequestValidator(),
-				serviceContext)
+				serviceContext,
+				serviceProxyPool)
 		{
 		}
 
@@ -47,19 +52,21 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 			IRequestValidator requestValidator,
 			JsonSerializerOptions serializationOptions,
 			JsonSerializerOptions deserializationOptions,
-			StatelessServiceContext serviceContext)
+			StatelessServiceContext serviceContext,
+			IRpServiceProxyPool serviceProxyPool)
 				: base(httpPrefix,
 					triggerPath,
 					triggerHttpMethod,
 					requestValidator,
 					serializationOptions,
 					deserializationOptions,
-					serviceContext)
+					serviceContext,
+					serviceProxyPool)
 		{
 		}
 
 		/// <inheritdoc/>
-		protected override async Task<ISerializableRequest> ParseRequest(HttpListenerRequest httpRequest)
+		protected override async Task<IJsonSerializableRequest> ParseRequest(HttpListenerRequest httpRequest)
 		{
 			using Stream body = httpRequest.InputStream;
 			RegulationQueryRequest? reqParsed = await JsonSerializer.DeserializeAsync<RegulationQueryRequest>(body, deserializationOptions).ConfigureAwait(false);
@@ -73,25 +80,34 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 		}
 
 		/// <inheritdoc/>
-		protected override async Task<bool> TryCreateResponse(ISerializableRequest deserializedRequest, HttpListenerResponse httpResponse)
+		protected override async Task<bool> TryCreateResponse(IJsonSerializableRequest deserializedRequest, HttpListenerResponse httpResponse)
 		{
 			RegulationQueryRequest deserializedRequestCasted = (RegulationQueryRequest)deserializedRequest;
+			RegulationResponse queryResponse = null;
 
-			//TODO: Add actual logic to create response based on the deserialized request. For now, we return a default response indicating that the system was unable to provide a response.
-			RegulationQueryResponse deserializedResponse = new RegulationQueryResponse
+			try
 			{
-				ShortAnswer = "Server was unable to provide response.",
-				Explanation = string.Empty,
-				Citations = Enumerable.Empty<DocumentCitation>(),
-				Confidence = 0f,
-			};
+				queryResponse = await serviceProxyPool.GetProxy<IRegulationQuery>()
+					.SubmitQuestion(deserializedRequestCasted).ConfigureAwait(false);
+
+				LogError("QueryService did not provided response");
+			}
+			catch (Exception ex)
+			{
+				LogError("Failed to process regulation query via QueryService", ex);
+			}
+
+			if (queryResponse == null)
+			{
+				queryResponse = RegulationResponse.FailedResponse;
+			}
 
 			httpResponse.StatusCode = (int)HttpStatusCode.OK;
 			httpResponse.ContentType = ListenerConstants.ResponseTypeUTF8Json;
-			await JsonSerializer.SerializeAsync(httpResponse.OutputStream, deserializedResponse, serializationOptions).ConfigureAwait(false);
+			await JsonSerializer.SerializeAsync(httpResponse.OutputStream, failedResponse, serializationOptions).ConfigureAwait(false);
 			httpResponse.OutputStream.Close();
 
-			return true;
+			return ReferenceEquals(queryResponse, failedResponse);
 		}
 	}
 }

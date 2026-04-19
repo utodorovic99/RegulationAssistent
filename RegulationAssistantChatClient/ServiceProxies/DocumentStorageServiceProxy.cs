@@ -102,7 +102,7 @@ namespace RegulationAssistantChatClient.Services
 					PropertyNameCaseInsensitive = true
 				};
 
-				GetDocumentsResponse? deserializedResponse = JsonSerializer.Deserialize<GetDocumentsResponse>(responseContent, deserializationOptions);
+				GetDocumentsInfoResponse? deserializedResponse = JsonSerializer.Deserialize<GetDocumentsInfoResponse>(responseContent, deserializationOptions);
 				return deserializedResponse?.Documents ?? new List<DocumentItemDescriptor>();
 			}
 			catch (Exception ex)

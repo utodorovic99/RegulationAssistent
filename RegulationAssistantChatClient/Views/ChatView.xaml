@@ -4,12 +4,12 @@
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:conv="clr-namespace:RegulationAssistantChatClient.Converters"
+ xmlns:res="clr-namespace:RegulationAssistantChatClient.Properties"
  mc:Ignorable="d"
  d:DesignHeight="400" d:DesignWidth="600">
 
 	<UserControl.Resources>
 		<conv:MultiplyConverter x:Key="MultiplyConverter" />
-		<conv:LanguageToResourceConverter x:Key="LanguageToResourceConverter" />
 	</UserControl.Resources>
 
 	<Grid Margin="10">
@@ -65,14 +65,12 @@
 			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
-				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
 
-			<TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Language, Converter={StaticResource LanguageToResourceConverter}, ConverterParameter=DateLabel}" Foreground="{StaticResource ForegroundBrush}" Margin="0,0,6,4" VerticalAlignment="Bottom" />
-			<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Language, Converter={StaticResource LanguageToResourceConverter}, ConverterParameter=OrganizationLabel}" Foreground="{StaticResource ForegroundBrush}" Margin="0,0,6,4" VerticalAlignment="Bottom" />
+			<TextBlock Grid.Row="0" Grid.Column="0" Text='{x:Static res:Resources.DateLabel}' Foreground="{StaticResource ForegroundBrush}" Margin="0,0,6,4" VerticalAlignment="Bottom" />
 
 			<DatePicker Grid.Row="1" Grid.Column="0" SelectedDate="{Binding SelectedDate}" Height="40" Width="140" VerticalAlignment="Center" Margin="0,0,12,0"
 						 Foreground="{StaticResource TextBoxForegroundBrush}" Background="{StaticResource BackgroundBrush}" CalendarStyle="{StaticResource DarkCalendarStyle}">
@@ -89,18 +87,12 @@
 					</Style>
 				</DatePicker.Resources>
 			</DatePicker>
-			<ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding OrganizationTypes}" SelectedValue="{Binding SelectedOrganizationTypeString, Mode=TwoWay}" SelectedValuePath="Tag" DisplayMemberPath="Display" Width="140" Height="40" VerticalAlignment="Center" Margin="0,0,12,0" />
+			<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Question, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,10,0" VerticalAlignment="Center" Height="40"
+						TextWrapping="Wrap" AcceptsReturn="True" MaxLines="3" MaxHeight="60" VerticalScrollBarVisibility="Visible"
+						Background="{StaticResource TextBoxBackgroundBrush}" Foreground="{StaticResource TextBoxForegroundBrush}" />
 
-			<TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Question, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,10,0" VerticalAlignment="Center" Height="40"
-					TextWrapping="Wrap" AcceptsReturn="True" MaxLines="3" MaxHeight="60" VerticalScrollBarVisibility="Visible"
-					Background="{StaticResource TextBoxBackgroundBrush}" Foreground="{StaticResource TextBoxForegroundBrush}" />
-
-			<Button Grid.Row="1" Grid.Column="3" Command="{Binding SendCommand}" Width="100" VerticalAlignment="Center" Height="40">
-				<TextBlock Text="{Binding Language, Converter={StaticResource LanguageToResourceConverter}, ConverterParameter=SendButton}" Foreground="{StaticResource ButtonForegroundBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-			</Button>
-			<Button Grid.Row="1" Grid.Column="4" Command="{Binding ClearChatCommand}" Width="100" VerticalAlignment="Center" Height="40" Margin="10,0,0,0">
-				<TextBlock Text="{Binding Language, Converter={StaticResource LanguageToResourceConverter}, ConverterParameter=ClearButton}" Foreground="{StaticResource ButtonForegroundBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-			</Button>
+			<Button Grid.Row="1" Grid.Column="2" Command="{Binding SendCommand}" Width="100" VerticalAlignment="Center" Height="40" Content="{x:Static res:Resources.SendButton}" />
+			<Button Grid.Row="1" Grid.Column="3" Command="{Binding ClearChatCommand}" Width="100" VerticalAlignment="Center" Height="40" Margin="10,0,0,0" Content="{x:Static res:Resources.ClearButton}" />
 		</Grid>
 	</Grid>
 </UserControl>

@@ -1,5 +1,6 @@
-using System.Diagnostics;
 using System.Fabric;
+using CommonSDK.ServiceProxies;
+using DocumentStorageService.Commands;
 using ExternalServiceContracts.Context.Regulation.Documents.Requests;
 using ExternalServiceContracts.Context.Regulation.Documents.Responses;
 using ExternalServiceContracts.Requests;
@@ -15,7 +16,9 @@ namespace DocumentStorageService
 	/// </summary>
 	internal sealed class DocumentStorageService : StatefulService, IDocumentStorageService
 	{
-		private readonly DocumentPersistenceStorage persistence;
+		private readonly IDocumentPersistenceStorage persistence;
+		private readonly IRpServiceProxyPool serviceProxyPool;
+		private readonly ITransactionCommandExecutor transactionCommandExecutor;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DocumentStorageService"/> class.
@@ -25,6 +28,10 @@ namespace DocumentStorageService
 			: base(context)
 		{
 			persistence = new DocumentPersistenceStorage(this.StateManager);
+			transactionCommandExecutor = new TransactionCommandExecutor();
+			serviceProxyPool = new RpServiceProxyPool();
+
+			serviceProxyPool.RegisterFabricRP2Proxy<IDocumentIndexWritter>("fabric:/RegulationAssistent/DocumentIndexingService", ServiceType.Stateful);
 		}
 
 		/// <summary>
@@ -45,34 +52,25 @@ namespace DocumentStorageService
 
 		/// <summary>
 		/// Store a document into a reliable dictionary. Delegates to DocumentPersistenceStorage.
+		/// Uses StoreDocumentTransactionCommand to perform store + indexing with rollback on failure.
 		/// </summary>
 		/// <param name="request">The document upload request containing the document metadata.</param>
-		public async Task<DocumentItemDescriptor> StoreDocument(DocumentUploadRequest request)
+		public async Task<StoreDocumentResponse> StoreDocument(DocumentUploadRequest request)
 		{
+			ArgumentNullException.ThrowIfNull(nameof(request));
+
+			ServiceEventSource.Current.ServiceMessage(this.Context, $"StoreDocument called for: {request.Title}");
+			var command = new StoreDocumentTransactionCommand(persistence, serviceProxyPool, request);
+
 			try
 			{
-				if (request == null)
-				{
-					throw new ArgumentNullException(nameof(request));
-				}
-
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"StoreDocument called for: {request.Title}");
-				var result = await persistence.StoreDocumentAsync(request);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"StoreDocument completed successfully");
-				return result;
-			}
-			catch (InvalidOperationException)
-			{
-				throw;
-			}
-			catch (ArgumentException)
-			{
-				throw;
+				await transactionCommandExecutor.RunAsync(command).ConfigureAwait(false);
+				return (StoreDocumentResponse)command.Result;
 			}
 			catch (Exception ex)
 			{
 				ServiceEventSource.Current.ServiceMessage(this.Context, $"StoreDocument failed: {ex.GetType().Name} - {ex.Message}");
-				throw new InvalidOperationException($"Failed to store document: {ex.Message}", ex);
+				return new StoreDocumentResponse { Success = false, ErrorMessage = ex.Message };
 			}
 		}
 
@@ -83,6 +81,14 @@ namespace DocumentStorageService
 		public Task<List<DocumentItemDescriptor>> GetAllDocuments()
 		{
 			return persistence.GetAllDocumentsAsync();
+		}
+
+		/// <summary>
+		/// Retrieves latest document descriptor for given title, or null if none exists.
+		/// </summary>
+		public async Task<DocumentItemDescriptor?> GetLatestDocumentByTitle(string title)
+		{
+			return await persistence.GetLatestDocumentByTitleAsync(title).ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -115,7 +121,7 @@ namespace DocumentStorageService
 				{
 					FileBytes = fileBytes,
 					Title = request.Title,
-					VersionNumber = request.VersionNumber
+					VersionNumber = request.VersionNumber,
 				};
 			}
 			catch (InvalidOperationException)
@@ -133,65 +139,22 @@ namespace DocumentStorageService
 			}
 		}
 
-		/// <summary>
-		/// Deletes a specific document by title and version number.
-		/// </summary>
-		/// <param name="request">Request containing the document title and version number to delete.</param>
-		/// <returns>Response indicating success or failure.</returns>
 		public async Task<DeleteDocumentResponse> DeleteDocument(DeleteDocumentRequest request)
 		{
+			ArgumentNullException.ThrowIfNull(nameof(request));
+
+			ServiceEventSource.Current.ServiceMessage(this.Context, $"DeleteDocument called for: {request.Title} v{request.VersionNumber}");
+			var command = new DeleteDocumentTransactionCommand(persistence, serviceProxyPool, request);
+
 			try
 			{
-				if (request == null)
-				{
-					throw new ArgumentNullException(nameof(request));
-				}
-
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"DeleteDocument called for: {request.Title} v{request.VersionNumber}");
-
-				bool deleted = await persistence.DeleteDocumentAsync(request.Title, request.VersionNumber);
-
-				if (deleted)
-				{
-					ServiceEventSource.Current.ServiceMessage(this.Context, $"DeleteDocument completed successfully");
-					return new DeleteDocumentResponse { Success = true };
-				}
-				else
-				{
-					ServiceEventSource.Current.ServiceMessage(this.Context, $"Document not found: {request.Title} v{request.VersionNumber}");
-					return new DeleteDocumentResponse
-					{
-						Success = false,
-						ErrorMessage = "Document not found"
-					};
-				}
-			}
-			catch (InvalidOperationException ex)
-			{
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"DeleteDocument failed: {ex.GetType().Name} - {ex.Message}");
-				return new DeleteDocumentResponse
-				{
-					Success = false,
-					ErrorMessage = ex.Message
-				};
-			}
-			catch (ArgumentException ex)
-			{
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"DeleteDocument failed: {ex.GetType().Name} - {ex.Message}");
-				return new DeleteDocumentResponse
-				{
-					Success = false,
-					ErrorMessage = ex.Message
-				};
+				await transactionCommandExecutor.RunAsync(command).ConfigureAwait(false);
+				return (DeleteDocumentResponse)command.Result;
 			}
 			catch (Exception ex)
 			{
 				ServiceEventSource.Current.ServiceMessage(this.Context, $"DeleteDocument failed: {ex.GetType().Name} - {ex.Message}");
-				return new DeleteDocumentResponse
-				{
-					Success = false,
-					ErrorMessage = $"Failed to delete document: {ex.Message}"
-				};
+				return new DeleteDocumentResponse { Success = false, ErrorMessage = ex.Message };
 			}
 		}
 

@@ -35,7 +35,7 @@
 			<Setter.Value>
 				<ControlTemplate TargetType="Button">
 					<Border Background="{TemplateBinding Background}"
-						BorderBrush="{TemplateBinding BorderBrush}"
+						BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={StaticResource ForegroundBrush}}"
 						BorderThickness="{TemplateBinding BorderThickness}"
 						CornerRadius="10"
 						SnapsToDevicePixels="True">
@@ -93,7 +93,7 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="CalendarDayButton">
-					<Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
+					<Border Background="{TemplateBinding Background}" BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={StaticResource ForegroundBrush}}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
 						<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
 					</Border>
 					<ControlTemplate.Triggers>
@@ -116,7 +116,7 @@
 	<Style TargetType="ToggleButton">
 		<Setter Property="Background" Value="Transparent" />
 		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
-		<Setter Property="BorderBrush" Value="Transparent" />
+		<Setter Property="BorderBrush" Value="{StaticResource ForegroundBrush}" />
 	</Style>
 
 	<Style TargetType="CalendarButton">
@@ -140,7 +140,7 @@
 						<ToggleButton Name="ToggleButton"
 							Background="{TemplateBinding Background}"
 							Foreground="{TemplateBinding Foreground}"
-							BorderBrush="{TemplateBinding BorderBrush}"
+							BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={StaticResource ForegroundBrush}}"
 							BorderThickness="{TemplateBinding BorderThickness}"
 							Padding="{TemplateBinding Padding}"
 							Focusable="False"
@@ -158,7 +158,7 @@
 									<Grid>
 										<Border x:Name="ToggleButtonBorder"
 											Background="{TemplateBinding Background}"
-											BorderBrush="{TemplateBinding BorderBrush}"
+											BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={StaticResource ForegroundBrush}}"
 											BorderThickness="{TemplateBinding BorderThickness}" />
 										<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
 									</Grid>

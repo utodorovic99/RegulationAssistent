@@ -8,7 +8,7 @@ namespace ExternalServiceContracts.Context.Regulation.Documents.Requests
 	/// Request to retrieve a specific document by title and version.
 	/// </summary>
 	[DataContract]
-	public sealed class GetDocumentRequest : ISerializableRequest
+	public sealed class GetDocumentRequest : IJsonSerializableRequest
 	{
 		/// <summary>
 		/// Gets or sets the title of the document to retrieve.

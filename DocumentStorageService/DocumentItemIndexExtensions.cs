@@ -1,4 +1,5 @@
-﻿using DocumentStorageService.Storage;
+﻿using CommonSDK;
+using DocumentStorageService.Storage;
 using ExternalServiceContracts.Context.Regulation.Documents.Responses;
 
 namespace DocumentStorageService
@@ -17,10 +18,12 @@ namespace DocumentStorageService
 		{
 			return new DocumentItemDescriptor
 			{
+				Id = NamingHelper.CreateVersionedName(index.Title, index.VersionNumber),
 				Title = index.Title,
 				VersionNumber = index.VersionNumber,
 				ValidFrom = index.ValidFrom,
-				ValidTo = index.ValidTo,
+				// If ValidTo was not specified, fall back to ValidFrom so descriptor has a sensible value
+				ValidTo = index.ValidTo ?? index.ValidFrom,
 			};
 		}
 	}

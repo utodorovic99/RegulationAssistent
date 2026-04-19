@@ -3,6 +3,7 @@
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:res="clr-namespace:RegulationAssistantChatClient.Properties"
  mc:Ignorable="d"
  Height="Auto" Width="Auto">
 	<Grid Margin="10">
@@ -13,22 +14,22 @@
 
 		<!-- DataGrid with improved dark styling to make columns and content clearly visible -->
 		<DataGrid x:Name="DocumentsDataGrid" Grid.Row="0"
-	ItemsSource="{Binding Documents}"
-	SelectedItem="{Binding SelectedDocument, Mode=TwoWay}"
-	AutoGenerateColumns="False"
-	CanUserAddRows="False"
-	CanUserDeleteRows="False"
-	HeadersVisibility="Column"
-	GridLinesVisibility="None"
-	RowHeaderWidth="0"
-	Background="{StaticResource BackgroundBrush}"
-	Foreground="{StaticResource ForegroundBrush}"
-	HorizontalGridLinesBrush="Transparent"
-	VerticalGridLinesBrush="Transparent"
-	SelectionMode="Single"
-	SelectionUnit="FullRow"
-	FontSize="14"
-	IsReadOnly="True">
+	    ItemsSource="{Binding Documents}"
+	    SelectedItem="{Binding SelectedDocument, Mode=TwoWay}"
+	    AutoGenerateColumns="False"
+	    CanUserAddRows="False"
+	    CanUserDeleteRows="False"
+	    HeadersVisibility="Column"
+	    GridLinesVisibility="None"
+	    RowHeaderWidth="0"
+	    Background="{StaticResource BackgroundBrush}"
+	    Foreground="{StaticResource ForegroundBrush}"
+	    HorizontalGridLinesBrush="Transparent"
+	    VerticalGridLinesBrush="Transparent"
+	    SelectionMode="Single"
+	    SelectionUnit="FullRow"
+	    FontSize="14"
+	    IsReadOnly="True">
 
 			<DataGrid.Resources>
 				<Style TargetType="DataGridColumnHeader">
@@ -72,13 +73,13 @@
 			</DataGrid.RowStyle>
 
 			<DataGrid.Columns>
-				<DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*">
+				<DataGridTextColumn Header="{x:Static res:Resources.Documents_TitleHeader}" Binding="{Binding Title}" Width="*">
 					<DataGridTextColumn.ElementStyle>
 						<Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellTextStyle}" />
 					</DataGridTextColumn.ElementStyle>
 				</DataGridTextColumn>
 
-				<DataGridTextColumn Header="Version" Binding="{Binding VersionNumber}" Width="100">
+				<DataGridTextColumn Header="{x:Static res:Resources.Documents_VersionHeader}" Binding="{Binding VersionNumber}" Width="100">
 					<DataGridTextColumn.ElementStyle>
 						<Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellTextStyle}">
 							<Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -86,7 +87,7 @@
 					</DataGridTextColumn.ElementStyle>
 				</DataGridTextColumn>
 
-				<DataGridTextColumn Header="Valid From" Binding="{Binding ValidFrom, StringFormat=d}" Width="140" IsReadOnly="True">
+				<DataGridTextColumn Header="{x:Static res:Resources.Documents_ValidFromHeader}" Binding="{Binding ValidFrom, StringFormat=d}" Width="140" IsReadOnly="True">
 					<DataGridTextColumn.ElementStyle>
 						<Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellTextStyle}">
 							<Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -94,7 +95,7 @@
 					</DataGridTextColumn.ElementStyle>
 				</DataGridTextColumn>
 
-				<DataGridTextColumn Header="Valid To" Binding="{Binding ValidTo, StringFormat=d}" Width="140" IsReadOnly="True">
+				<DataGridTextColumn Header="{x:Static res:Resources.Documents_ValidToHeader}" Binding="{Binding ValidTo, StringFormat=d}" Width="140" IsReadOnly="True">
 					<DataGridTextColumn.ElementStyle>
 						<Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellTextStyle}">
 							<Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -105,10 +106,11 @@
 		</DataGrid>
 
 		<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0">
-			<Button Command="{Binding NewCommand}" Width="60" Height="30" Margin="0,0,10,0">New</Button>
-			<Button Command="{Binding UploadCommand}" Width="80" Height="30" Margin="0,0,10,0">Upload</Button>
-			<Button Command="{Binding EditCommand}" Width="80" Height="30" Margin="0,0,10,0">Edit</Button>
-			<Button Command="{Binding DeleteCommand}" Width="80" Height="30">Delete</Button>
+			<Button Command="{Binding NewCommand}" Width="60" Height="30" Margin="0,0,10,0" Content="{x:Static res:Resources.NewButton}" />
+			<Button Command="{Binding UploadCommand}" Width="80" Height="30" Margin="0,0,10,0" Content="{x:Static res:Resources.UploadButton}" />
+			<Button Command="{Binding EditCommand}" Width="80" Height="30" Margin="0,0,10,0" Content="{x:Static res:Resources.EditButton}" />
+			<Button Command="{Binding DeleteCommand}" Width="80" Height="30" Margin="0,0,10,0" Content="{x:Static res:Resources.DeleteButton}" />
+			<Button Command="{Binding RefreshCommand}" Width="80" Height="30" Content="Osvezi" />
 		</StackPanel>
 	</Grid>
 </UserControl>

@@ -1,15 +1,14 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using CommonSDK;
 using ExternalServiceContracts.Context.Regulation.Documents.Responses;
 using ExternalServiceContracts.Requests;
 using RegulationAssistantChatClient.Services;
-using RegulationAssistantChatClient.Views;
 
 namespace RegulationAssistantChatClient.ViewModels.Documents
 {
@@ -32,6 +31,7 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 			NewCommand = new RelayCommand(OnNew);
 			EditCommand = new RelayCommand(OnEdit, CanEdit);
 			DeleteCommand = new RelayCommand(OnDelete, CanDelete);
+			RefreshCommand = new RelayCommand(OnRefresh);
 
 			// Load documents asynchronously when the view model is created
 			_ = LoadDocumentsAsync();
@@ -81,6 +81,11 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 		/// Gets command for uploading document.
 		/// </summary>
 		public ICommand UploadCommand { get; }
+
+		/// <summary>
+		/// Gets command to refresh the documents list from the service.
+		/// </summary>
+		public ICommand RefreshCommand { get; }
 
 		/// <summary>
 		/// Gets command for creating new document.
@@ -161,7 +166,7 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 				editor.DocumentClosed += (sender, args) =>
 				{
 					System.Diagnostics.Debug.WriteLine($"Document closed. WasModified: {args.WasModified}, HasBytes: {args.FileBytes != null}");
-					
+
 					if (args.WasModified && args.FileBytes != null)
 					{
 						// Marshal to UI thread for MessageBox and UI updates
@@ -170,7 +175,7 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 							try
 							{
 								System.Diagnostics.Debug.WriteLine($"Prompting user to save document: {document.Title}");
-								
+
 								// Ask user if they want to save changes as a new version
 								var result = MessageBox.Show(
 									$"The document '{document.Title}' has been modified.\n\nDo you want to save changes as a new version (v{document.VersionNumber + 1})?",
@@ -227,12 +232,13 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 			try
 			{
 				System.Diagnostics.Debug.WriteLine($"SaveDocumentAsNewVersionAsync called. Title: {originalTitle}, FileBytes length: {fileBytes?.Length}");
-				
+
 				var request = new DocumentUploadRequest
 				{
 					Title = originalTitle,
-					ValidFrom = DateTime.Now.Date,
-					FileBytes = fileBytes
+					ValidFrom = DateOnly.FromDateTime(DateTime.Now),
+					FileBytes = fileBytes,
+					Format = DocumentFormat.Docx,
 				};
 
 				var uploadedDocument = await UploadDocumentAsync(request);
@@ -246,7 +252,7 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 						"Success",
 						MessageBoxButton.OK,
 						MessageBoxImage.Information);
-					
+
 					System.Diagnostics.Debug.WriteLine("Refreshing documents list...");
 					// Refresh the documents list to ensure it's up to date
 					await LoadDocumentsAsync();
@@ -335,6 +341,14 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 		private void OnUpload()
 		{
 			UploadRequested?.Invoke();
+		}
+
+		/// <summary>
+		/// Handler for refresh command. Reloads documents from service.
+		/// </summary>
+		private void OnRefresh()
+		{
+			_ = LoadDocumentsAsync();
 		}
 
 		/// <summary>
@@ -527,7 +541,7 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 				var request = new DocumentUploadRequest
 				{
 					Title = title,
-					ValidFrom = DateTime.Now.Date,
+					ValidFrom = DateOnly.FromDateTime(DateTime.Now),
 					FileBytes = fileBytes
 				};
 
@@ -540,7 +554,7 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 						"Success",
 						MessageBoxButton.OK,
 						MessageBoxImage.Information);
-					
+
 					// Refresh the documents list to ensure it's up to date
 					await LoadDocumentsAsync();
 				}
@@ -575,11 +589,11 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 			try
 			{
 				System.Diagnostics.Debug.WriteLine($"UploadDocumentAsync called for: {request.Title}");
-				
+
 				DocumentUploadResponse? response = await documentStorageProxy.UploadDocumentAsync(request);
-				
+
 				System.Diagnostics.Debug.WriteLine($"Upload response received. Success: {response?.DocumentDescriptor != null}");
-				
+
 				if (response?.DocumentDescriptor != null)
 				{
 					await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
@@ -607,11 +621,11 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 			try
 			{
 				System.Diagnostics.Debug.WriteLine("Loading documents from service...");
-				
+
 				var documents = await documentStorageProxy.GetAllDocumentsAsync();
-				
+
 				System.Diagnostics.Debug.WriteLine($"Received {documents?.Count ?? 0} documents from service.");
-				
+
 				await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
 				{
 					Documents.Clear();

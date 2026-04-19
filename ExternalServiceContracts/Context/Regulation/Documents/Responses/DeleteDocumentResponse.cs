@@ -8,7 +8,7 @@ namespace ExternalServiceContracts.Context.Regulation.Documents.Responses
 	/// Response indicating whether a document was successfully deleted.
 	/// </summary>
 	[DataContract]
-	public sealed class DeleteDocumentResponse : ISerializableResponse
+	public sealed class DeleteDocumentResponse : IJsonSerializableResponse
 	{
 		/// <summary>
 		/// Gets or sets a value indicating whether the deletion was successful.

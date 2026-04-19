@@ -8,7 +8,7 @@ namespace ExternalServiceContracts.Context.Regulation.Documents.Responses
 	/// Response containing the document file bytes.
 	/// </summary>
 	[DataContract]
-	public sealed class GetDocumentResponse : ISerializableResponse
+	public sealed class GetDocumentResponse : IJsonSerializableResponse
 	{
 		/// <summary>
 		/// Gets or sets the document file bytes.
@@ -30,5 +30,12 @@ namespace ExternalServiceContracts.Context.Regulation.Documents.Responses
 		[JsonPropertyName("versionNumber")]
 		[DataMember]
 		public int VersionNumber { get; set; }
+
+		/// <summary>
+		/// Document format (docx by default)
+		/// </summary>
+		[JsonPropertyName("format")]
+		[DataMember]
+		public DocumentFormat Format { get; set; }
 	}
 }

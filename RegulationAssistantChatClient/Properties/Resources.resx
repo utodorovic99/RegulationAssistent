@@ -1,100 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
- <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
- <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
- <xsd:element name="root" msdata:IsDataSet="true">
- <xsd:complexType>
- <xsd:choice maxOccurs="unbounded">
- <xsd:element name="data">
- <xsd:complexType>
- <xsd:sequence>
- <xsd:element name="value" type="xsd:string" minOccurs="0" />
- <xsd:element name="comment" type="xsd:string" minOccurs="0" />
- </xsd:sequence>
- <xsd:attribute name="name" type="xsd:string" use="required" />
- <xsd:attribute ref="xml:space" />
- </xsd:complexType>
- </xsd:element>
- <xsd:element name="resheader">
- <xsd:complexType>
- <xsd:sequence>
- <xsd:element name="value" type="xsd:string" minOccurs="0" />
- </xsd:sequence>
- <xsd:attribute name="name" type="xsd:string" use="required" />
- </xsd:complexType>
- </xsd:element>
- </xsd:choice>
- </xsd:complexType>
- </xsd:element>
- </xsd:schema>
- <resheader name="resmimetype">
- <value>text/microsoft-resx</value>
- </resheader>
- <resheader name="version">
- <value>2.0</value>
- </resheader>
- <resheader name="reader">
- <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
- </resheader>
- <resheader name="writer">
- <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
- </resheader>
- <data name="WelcomeMessage" xml:space="preserve">
- <value>Welcome to the Regulation Assistant! How can I help you?</value>
- </data>
- <data name="SendButton" xml:space="preserve">
- <value>Send</value>
- </data>
- <data name="ClearButton" xml:space="preserve">
- <value>Clear Chat</value>
- </data>
- <data name="DateLabel" xml:space="preserve">
- <value>Date:</value>
- </data>
- <data name="OrganizationLabel" xml:space="preserve">
- <value>Organization:</value>
- </data>
- <data name="OptionsHeader" xml:space="preserve">
- <value>Options</value>
- </data>
- <data name="LanguageLabel" xml:space="preserve">
- <value>Language:</value>
- </data>
- <data name="AnswerStyleLabel" xml:space="preserve">
- <value>Answer Style:</value>
- </data>
- <data name="AnswerStyle_Concise" xml:space="preserve">
- <value>Concise with Citations</value>
- </data>
- <data name="AnswerStyle_Detailed" xml:space="preserve">
- <value>Detailed</value>
- </data>
- <data name="AnswerStyle_BulletPoints" xml:space="preserve">
- <value>Bullet Points</value>
- </data>
- <data name="LanguageOption_English" xml:space="preserve">
- <value>English</value>
- </data>
- <data name="LanguageOption_Serbian" xml:space="preserve">
- <value>Serbian</value>
- </data>
- <!-- Organization type localization keys -->
- <data name="OrganizationType_Company" xml:space="preserve">
- <value>Company</value>
- </data>
- <data name="OrganizationType_Government" xml:space="preserve">
- <value>Government</value>
- </data>
- <data name="OrganizationType_NonProfit" xml:space="preserve">
- <value>Non-Profit</value>
- </data>
- <data name="OrganizationType_Educational" xml:space="preserve">
- <value>Educational</value>
- </data>
- <data name="OrganizationType_Healthcare" xml:space="preserve">
- <value>Healthcare</value>
- </data>
- <data name="OrganizationType_Other" xml:space="preserve">
- <value>Other</value>
- </data>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="WelcomeMessage" xml:space="preserve">
+    <value>Dobrodosli u pravnog asistenta. Kako vam mogu pomoci?</value>
+  </data>
+  <data name="SendButton" xml:space="preserve">
+    <value>Posalji</value>
+  </data>
+  <data name="ClearButton" xml:space="preserve">
+    <value>Ocisti</value>
+  </data>
+  <data name="DateLabel" xml:space="preserve">
+    <value>Datum:</value>
+  </data>
+  <data name="Documents_TitleHeader" xml:space="preserve">
+    <value>Naslov</value>
+  </data>
+  <data name="Documents_VersionHeader" xml:space="preserve">
+    <value>Verzija</value>
+  </data>
+  <data name="Documents_ValidFromHeader" xml:space="preserve">
+    <value>Vazi od</value>
+  </data>
+  <data name="Documents_ValidToHeader" xml:space="preserve">
+    <value>Vaze do</value>
+  </data>
+  <data name="NewButton" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="UploadButton" xml:space="preserve">
+    <value>Ucitaj</value>
+  </data>
+  <data name="EditButton" xml:space="preserve">
+    <value>Izmeni</value>
+  </data>
+  <data name="DeleteButton" xml:space="preserve">
+    <value>Obrisi</value>
+  </data>
+  <data name="DocumentTitle_Prompt" xml:space="preserve">
+    <value>Unesite naslov dokumenta:</value>
+  </data>
+  <data name="DocumentTitle_Save" xml:space="preserve">
+    <value>Sacuvaj</value>
+  </data>
+  <data name="DocumentTitle_Cancel" xml:space="preserve">
+    <value>Otkazi</value>
+  </data>
+  <data name="DocumentTitle_Required" xml:space="preserve">
+    <value>Unesite naslov dokumenta.</value>
+  </data>
+  <data name="Upload_Failed" xml:space="preserve">
+    <value>Nije uspelo slanje dokumenta.</value>
+  </data>
+  <data name="Upload_ErrorTitle" xml:space="preserve">
+    <value>Greska pri slanju</value>
+  </data>
+  <data name="Upload_ErrorDetail" xml:space="preserve">
+    <value>Greska pri slanju dokumenta: {0}</value>
+  </data>
+  <data name="DocumentNotFound_Title" xml:space="preserve">
+    <value>Dokument nije pronadjen</value>
+  </data>
+  <data name="DocumentNotFound_Message" xml:space="preserve">
+    <value>Neuspesno dohvatanje dokumenta. Naslov: {0} Verzija: {1}</value>
+  </data>
+  <data name="SaveChanges_Prompt" xml:space="preserve">
+    <value>Dokument '{0}' je izmenjen. Zelite li sacuvati izmene kao novu verziju (v{1})?</value>
+  </data>
+  <data name="SaveChanges_Title" xml:space="preserve">
+    <value>Sacuvaj izmene</value>
+  </data>
 </root>

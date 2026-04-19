@@ -24,4 +24,7 @@
   <ApplicationParameterFile Path="..\ApplicationParameters\Cloud.xml" />
   <StartupServiceParameterFile Path="..\StartupServiceParameters\Cloud.xml" />
   <CopyPackageParameters CompressPackage="true" />
+  <UpgradeDeployment Mode="Monitored" Enabled="true">
+    <Parameters FailureAction="Rollback" Force="True" />
+  </UpgradeDeployment>
 </PublishProfile>

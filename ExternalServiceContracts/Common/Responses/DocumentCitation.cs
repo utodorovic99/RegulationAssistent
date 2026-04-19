@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Text.Json.Serialization;
-using CommonSDK;
+﻿using System.Text.Json.Serialization;
 
 namespace ExternalServiceContracts.Common
 {
@@ -8,7 +6,7 @@ namespace ExternalServiceContracts.Common
 	/// Represents a citation for a specific section of a document, including the document name, version, section
 	/// identifier, and citation text.
 	/// </summary>
-	public sealed class DocumentCitation : IOptimizedStringOperations
+	public sealed class DocumentCitation
 	{
 		/// <summary>
 		/// Gets the name of the document.
@@ -33,23 +31,5 @@ namespace ExternalServiceContracts.Common
 		/// </summary>
 		[JsonPropertyName("citation-content")]
 		public string Citation { get; init; } = string.Empty;
-
-		/// <inheritdoc/>
-		public override string ToString()
-		{
-			StringBuilder sb = new StringBuilder();
-			AppendSelfAsString(sb);
-
-			return sb.ToString();
-		}
-
-		/// <inheritdoc/>
-		public void AppendSelfAsString(StringBuilder sb)
-		{
-			sb.AppendLine($"DocumentName: {DocumentName}");
-			sb.AppendLine($"Version: {Version}");
-			sb.AppendLine($"Section Id: {SectionId}");
-			sb.AppendLine($"Citation: {Citation}");
-		}
 	}
 }

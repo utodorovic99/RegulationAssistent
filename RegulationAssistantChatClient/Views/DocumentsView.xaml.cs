@@ -7,6 +7,8 @@ using ExternalServiceContracts.Context.Regulation.Documents.Responses;
 using ExternalServiceContracts.Requests;
 using Microsoft.Win32;
 using RegulationAssistantChatClient.ViewModels.Documents;
+using RegulationAssistantChatClient.Views;
+using RegulationAssistantChatClient.Properties;
 
 namespace RegulationAssistantChatClient.Views
 {
@@ -55,6 +57,8 @@ namespace RegulationAssistantChatClient.Views
 			{
 				return;
 			}
+			// Treat double-click as edit request
+			Vm_EditRequested(vm.SelectedDocument);
 		}
 
 		/// <summary>
@@ -72,23 +76,29 @@ namespace RegulationAssistantChatClient.Views
 					string path = dlg.FileName;
 					byte[] bytes = File.ReadAllBytes(path);
 
-					var request = new DocumentUploadRequest
+					// Show DocumentInfoDialog to get title and validity period
+					var infoDlg = new DocumentInfoDialog(Path.GetFileName(path));
+					if (infoDlg.ShowDialog() == true)
 					{
-						Title = Path.GetFileName(path),
-						ValidFrom = DateTime.Now.Date,
-						FileBytes = bytes
-					};
+						var request = new DocumentUploadRequest
+						{
+							Title = infoDlg.DocumentTitle,
+							ValidFrom = infoDlg.ValidFrom.HasValue ? DateOnly.FromDateTime(infoDlg.ValidFrom.Value) : DateOnly.FromDateTime(DateTime.Now),
+							ValidTo = infoDlg.ValidTo.HasValue ? DateOnly.FromDateTime(infoDlg.ValidTo.Value) : null,
+							FileBytes = bytes
+						};
 
-					var uploadedDocument = await vm.UploadDocumentAsync(request);
-					
-					if (uploadedDocument == null)
-					{
-						MessageBox.Show("Failed to upload document to the service.", "Upload Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+						var uploadedDocument = await vm.UploadDocumentAsync(request);
+
+						if (uploadedDocument == null)
+						{
+							MessageBox.Show(RegulationAssistantChatClient.Properties.Resources.Upload_Failed, RegulationAssistantChatClient.Properties.Resources.Upload_ErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+						}
 					}
 				}
 				catch (Exception ex)
 				{
-					MessageBox.Show("Error uploading document: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+					MessageBox.Show(string.Format(RegulationAssistantChatClient.Properties.Resources.Upload_ErrorDetail, ex.Message), RegulationAssistantChatClient.Properties.Resources.Upload_ErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
 		}
@@ -97,10 +107,38 @@ namespace RegulationAssistantChatClient.Views
 		/// Handler for edit document event.
 		/// </summary>
 		/// <param name="doc">Document whose edit is requested.</param>
-		private void Vm_EditRequested(DocumentItemDescriptor? doc)
+		private async void Vm_EditRequested(DocumentItemDescriptor? doc)
 		{
-			// The document will be opened in Microsoft Word directly via the view model
-			// No need to show a dialog anymore
+			if (doc == null) return;
+
+			try
+			{
+				// When editing, show dialog pre-filled with current values
+				var infoDlg = new DocumentInfoDialog(doc.Title, doc.ValidFrom.ToDateTime(TimeOnly.MinValue), doc.ValidTo.ToDateTime(TimeOnly.MinValue));
+
+				if (infoDlg.ShowDialog() == true)
+				{
+					// Request new upload as a new version with possibly updated metadata but no file changes
+					var request = new DocumentUploadRequest
+					{
+						Title = infoDlg.DocumentTitle,
+						ValidFrom = infoDlg.ValidFrom.HasValue ? DateOnly.FromDateTime(infoDlg.ValidFrom.Value) : doc.ValidFrom,
+						ValidTo = infoDlg.ValidTo.HasValue ? DateOnly.FromDateTime(infoDlg.ValidTo.Value) : doc.ValidTo,
+						FileBytes = Array.Empty<byte>() // No file content change in metadata-only edit
+					};
+
+					var uploaded = await vm.UploadDocumentAsync(request);
+
+					if (uploaded == null)
+					{
+						MessageBox.Show(RegulationAssistantChatClient.Properties.Resources.Upload_Failed, RegulationAssistantChatClient.Properties.Resources.Upload_ErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(string.Format(RegulationAssistantChatClient.Properties.Resources.Upload_ErrorDetail, ex.Message), RegulationAssistantChatClient.Properties.Resources.Upload_ErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 	}
 }
