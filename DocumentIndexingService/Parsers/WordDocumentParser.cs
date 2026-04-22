@@ -151,8 +151,8 @@ namespace DocumentIndexingService.Parsers
 					Law = descriptor.Title,
 					Chapter = chapter,
 					Article = article,
-					ValidFrom = descriptor.ValidFrom,
-					ValidTo = descriptor.ValidTo,
+					ValidFrom = DateOnly.FromDateTime(descriptor.ValidFrom),
+					ValidTo = DateOnly.FromDateTime(descriptor.ValidTo),
 					Text = text
 				}
 			};

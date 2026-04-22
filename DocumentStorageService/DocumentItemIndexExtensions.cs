@@ -21,9 +21,9 @@ namespace DocumentStorageService
 				Id = NamingHelper.CreateVersionedName(index.Title, index.VersionNumber),
 				Title = index.Title,
 				VersionNumber = index.VersionNumber,
-				ValidFrom = index.ValidFrom,
+				ValidFrom = index.ValidFrom.ToDateTime(TimeOnly.MinValue),
 				// If ValidTo was not specified, fall back to ValidFrom so descriptor has a sensible value
-				ValidTo = index.ValidTo ?? index.ValidFrom,
+				ValidTo = (index.ValidTo ?? index.ValidFrom).ToDateTime(TimeOnly.MinValue),
 			};
 		}
 	}

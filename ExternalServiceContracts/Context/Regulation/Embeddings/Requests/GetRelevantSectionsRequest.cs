@@ -5,5 +5,6 @@
 		public float[] QuestionEmbedding { get; set; }
 		public RegulationQueryContext QuestionContext { get; set; }
 		public int NumberOfResults { get; set; }
+		public float ScoreThreshold { get; set; } = 0.7f;
 	}
 }

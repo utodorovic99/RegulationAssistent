@@ -44,6 +44,12 @@ namespace DocumentStorageService.Commands
 
 			try
 			{
+				if (!request.BuildIndex)
+				{
+					result = new StoreDocumentResponse { DocumentDescriptor = storedDocument, Success = true };
+					return;
+				}
+
 				var buildReq = new BuildDocumentIndexRequest
 				{
 					DocumentDescriptor = storedDocument,

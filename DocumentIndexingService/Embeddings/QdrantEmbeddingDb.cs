@@ -131,7 +131,7 @@ namespace DocumentIndexingService.Embeddings
 
 		public async Task<GetRelevantSectionsResponse> GetIndexedResults(GetRelevantSectionsRequest request)
 		{
-			if (request == null)
+			if (request == null || request.QuestionEmbedding == null || request.QuestionEmbedding.Length == 0)
 			{
 				return GetRelevantSectionsResponse.EmptyResponse;
 			}
@@ -149,7 +149,18 @@ namespace DocumentIndexingService.Embeddings
 			var json = JsonSerializer.Serialize(body, filterOptions);
 			using var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 			var resp = await httpClient.PostAsync(uri, content).ConfigureAwait(false);
-			resp.EnsureSuccessStatusCode();
+
+			try
+			{
+				resp.EnsureSuccessStatusCode();
+			}
+			catch (Exception)
+			{
+				var errBody = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
+				ServiceEventSource.Current.Message($"GetIndexedResults: Qdrant search failed. Status: {resp.StatusCode}, Response: {errBody}, Request: {json}");
+				return GetRelevantSectionsResponse.EmptyResponse;
+			}
+
 			var respTxt = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
 			// parse response for hits
@@ -167,41 +178,73 @@ namespace DocumentIndexingService.Embeddings
 			GetRelevantSectionsResponse response = new GetRelevantSectionsResponse();
 			foreach (var item in resultsArray)
 			{
-				var payloadEl = item.GetProperty("payload");
+				if (!item.TryGetProperty("payload", out var payloadEl) || payloadEl.ValueKind != JsonValueKind.Object)
+				{
+					continue;
+				}
 
 				response.RelevantSections.Add(new RelevantSection
 				{
-					Law = payloadEl.GetProperty("law").GetString(),
-					Chapter = payloadEl.GetProperty("chapter").GetUInt32(),
-					Article = payloadEl.GetProperty("article").GetUInt32(),
-					Text = payloadEl.GetProperty("text").GetString(),
+					Law = payloadEl.TryGetProperty("law", out var lawEl) ? lawEl.GetString() : string.Empty,
+					Chapter = payloadEl.TryGetProperty("chapter", out var chapterEl) && chapterEl.TryGetUInt32(out var chapter) ? chapter : 0,
+					Article = payloadEl.TryGetProperty("article", out var articleEl) && articleEl.TryGetUInt32(out var article) ? article : 0,
+					Text = payloadEl.TryGetProperty("text", out var textEl) ? textEl.GetString() : string.Empty,
 				});
 			}
 
 			return response;
 		}
 
-		private Object GetFilterByQuestionWithContext(GetRelevantSectionsRequest request)
+		private object GetFilterByQuestionWithContext(GetRelevantSectionsRequest request)
 		{
-			return new
+			string? queryDate = request.QuestionContext != null && request.QuestionContext.Date != default
+				? request.QuestionContext.Date.ToUniversalTime().ToString("o")
+				: null;
+
+			object? filter = null;
+
+			if (queryDate != null)
 			{
-				vector = request.QuestionEmbedding,
-				top = request.NumberOfResults,
-				filter = new
+				filter =
+				new
 				{
 					must = new object[]
 					{
-						new {
-							key = "payload.validFrom",
-							range = new { lte = request.QuestionContext.Date.ToString("yyyy-MM-dd") }
+						new
+						{
+							key = "validFrom",
+							range = new
+							{
+								lte = queryDate
+							}
 						},
-						new {
-							key = "payload.validTo",
-							range = new { gte = request.QuestionContext.Date.ToString("yyyy-MM-dd") }
+
+						new
+						{
+							key = "validTo",
+							range = new
+							{
+								gte = queryDate
+							}
 						}
 					}
-				}
+				};
+			}
+
+			var query = new Dictionary<string, object>
+			{
+				["vector"] = request.QuestionEmbedding,
+				["limit"] = Math.Max(1, request.NumberOfResults),
+				["with_payload"] = true,
+				["score_threshold"] = request.ScoreThreshold
 			};
+
+			if (filter != null)
+			{
+				query["filter"] = filter;
+			}
+
+			return query;
 		}
 
 		private Object GetFilterByDocumentId(string documentId)

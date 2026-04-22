@@ -23,14 +23,14 @@ namespace ExternalServiceContracts.Requests
 		/// </summary>
 		[JsonPropertyName("validFrom")]
 		[DataMember]
-		public DateOnly ValidFrom { get; set; }
+		public DateTime ValidFrom { get; set; }
 
 		/// <summary>
 		/// Gets or sets date till document is valid. Nullable when document has no end date.
 		/// </summary>
 		[JsonPropertyName("validTo")]
 		[DataMember]
-		public DateOnly? ValidTo { get; set; }
+		public DateTime? ValidTo { get; set; }
 
 		/// <summary>
 		/// Gets or sets document file bytes.
@@ -45,5 +45,12 @@ namespace ExternalServiceContracts.Requests
 		[JsonPropertyName("format")]
 		[DataMember]
 		public DocumentFormat Format { get; set; } = DocumentFormat.Docx;
+
+		/// <summary>
+		/// Gets or sets whether document indexing should be built after upload.
+		/// </summary>
+		[JsonPropertyName("buildIndex")]
+		[DataMember]
+		public bool BuildIndex { get; set; } = true;
 	}
 }

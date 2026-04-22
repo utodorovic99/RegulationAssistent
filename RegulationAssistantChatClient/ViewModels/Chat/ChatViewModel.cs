@@ -137,7 +137,7 @@ namespace RegulationAssistantChatClient.ViewModels
 				Question = Question,
 				Context = new RegulationQueryContext
 				{
-					Date = DateOnly.FromDateTime(SelectedDate ?? DateTime.Now.Date),
+					Date = (SelectedDate ?? DateTime.Now.Date).Date,
 				},
 			};
 

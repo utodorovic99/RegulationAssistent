@@ -103,8 +103,8 @@ namespace DocumentStorageService
 				{
 					Title = request.Title,
 					VersionNumber = nextVersion,
-					ValidFrom = request.ValidFrom,
-					ValidTo = request.ValidTo,
+					ValidFrom = DateOnly.FromDateTime(request.ValidFrom),
+					ValidTo = request.ValidTo.HasValue ? DateOnly.FromDateTime(request.ValidTo.Value) : null,
 					BlobUri = blobUri?.ToString(),
 				};
 
@@ -351,8 +351,8 @@ namespace DocumentStorageService
 					{
 						Title = title,
 						VersionNumber = versionNumber,
-						ValidFrom = descriptor.ValidFrom,
-						ValidTo = descriptor.ValidTo,
+						ValidFrom = DateOnly.FromDateTime(descriptor.ValidFrom),
+						ValidTo = DateOnly.FromDateTime(descriptor.ValidTo),
 						BlobUri = blobUri,
 					};
 
@@ -368,8 +368,8 @@ namespace DocumentStorageService
 				{
 					Title = title,
 					VersionNumber = versionNumber,
-					ValidFrom = descriptor.ValidFrom,
-					ValidTo = descriptor.ValidTo,
+					ValidFrom = DateOnly.FromDateTime(descriptor.ValidFrom),
+					ValidTo = DateOnly.FromDateTime(descriptor.ValidTo),
 					BlobUri = null,
 				};
 

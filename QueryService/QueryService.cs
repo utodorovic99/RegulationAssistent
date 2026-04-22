@@ -20,7 +20,7 @@ namespace QueryService
 		{
 			serviceProxyPool = new RpServiceProxyPool();
 			serviceProxyPool.RegisterFabricRP2Proxy<IDocumentIndexReader>("fabric:/RegulationAssistent/DocumentIndexingService", ServiceType.Stateful);
-			serviceProxyPool.RegisterFabricRP2Proxy<ILLMService>("fabric:/RegulationAssistent/ResponseService", ServiceType.Stateless);
+			serviceProxyPool.RegisterFabricRP2Proxy<ILLMService>("fabric:/RegulationAssistent/LLMService", ServiceType.Stateful);
 		}
 
 		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
@@ -35,7 +35,7 @@ namespace QueryService
 		{
 			ArgumentNullException.ThrowIfNull(request);
 
-			if (request != null && request.IsValid())
+			if (request != null)
 			{
 				try
 				{
@@ -49,7 +49,8 @@ namespace QueryService
 						{
 							QuestionEmbedding = createQuestionEmbeddingResponse.Embedding,
 							QuestionContext = request.Context,
-							NumberOfResults = 5, //For now not comfigurable
+							NumberOfResults = 3,
+							ScoreThreshold = 0.7f,
 						};
 
 						GetRelevantSectionsResponse indexedResultsResponse = await serviceProxyPool.GetProxy<IDocumentIndexReader>().GetIndexedResults(getIndexedResultsRequest).ConfigureAwait(false);

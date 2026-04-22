@@ -1,6 +1,6 @@
 using System;
 using System.Net.Http;
-using System.Text;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ExternalServiceContracts.Requests;
@@ -46,25 +46,29 @@ namespace RegulationAssistantChatClient.Services
 		/// </remarks>
 		public async Task<RegulationResponse> SendRegulationQueryAsync(RegulationQueryRequest request)
 		{
+			if (request == null)
+			{
+				return RegulationResponse.FailedResponse;
+			}
+
 			try
 			{
 				string requestUrl = "Submit";
+				var options = new JsonSerializerOptions
+				{
+					PropertyNameCaseInsensitive = true,
+				};
 
-				string jsonContent = JsonSerializer.Serialize(request);
-				HttpContent httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-				HttpResponseMessage response = await httpClient.PostAsync($"{serviceUrl}/{requestUrl}", httpContent);
+				HttpResponseMessage response = await httpClient.PostAsJsonAsync($"{serviceUrl}/{requestUrl}", request);
 				response.EnsureSuccessStatusCode();
 
-				string responseContent = await response.Content.ReadAsStringAsync();
-
-				RegulationResponse deserializedResponse = JsonSerializer.Deserialize<RegulationResponse>(responseContent);
-				if (deserializedResponse != null)
+				RegulationResponse? deserializedResponse = await response.Content.ReadFromJsonAsync<RegulationResponse>(options);
+				if (!string.IsNullOrWhiteSpace(deserializedResponse?.Answer))
 				{
 					return deserializedResponse;
 				}
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 			}
 

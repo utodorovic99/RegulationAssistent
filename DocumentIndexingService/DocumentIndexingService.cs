@@ -184,20 +184,20 @@ namespace DocumentIndexingService
 
 		public async Task<GetRelevantSectionsResponse> GetIndexedResults(GetRelevantSectionsRequest request)
 		{
-			if (request != null)
+			if (request == null)
 			{
-
-				try
-				{
-					await embeddingDb.GetIndexedResults(request).ConfigureAwait(false);
-				}
-				catch (Exception e)
-				{
-					ServiceEventSource.Current.ServiceMessage(this.Context, $"Failed to retrieve indexed results from Qdrant for document: {e.Message}");
-				}
+				return GetRelevantSectionsResponse.EmptyResponse;
 			}
 
-			return GetRelevantSectionsResponse.EmptyResponse;
+			try
+			{
+				return await embeddingDb.GetIndexedResults(request).ConfigureAwait(false);
+			}
+			catch (Exception e)
+			{
+				ServiceEventSource.Current.ServiceMessage(this.Context, $"Failed to retrieve indexed results from Qdrant for document: {e.Message}");
+				return GetRelevantSectionsResponse.EmptyResponse;
+			}
 		}
 
 		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()

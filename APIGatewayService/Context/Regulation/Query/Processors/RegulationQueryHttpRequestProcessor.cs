@@ -85,13 +85,11 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 			RegulationQueryRequest deserializedRequestCasted = (RegulationQueryRequest)deserializedRequest;
 			RegulationResponse queryResponse = null;
 
-			try
-			{
-				queryResponse = await serviceProxyPool.GetProxy<IRegulationQuery>()
-					.SubmitQuestion(deserializedRequestCasted).ConfigureAwait(false);
-
-				LogError("QueryService did not provided response");
-			}
+            try
+            {
+                queryResponse = await serviceProxyPool.GetProxy<IRegulationQuery>()
+                    .SubmitQuestion(deserializedRequestCasted).ConfigureAwait(false);
+            }
 			catch (Exception ex)
 			{
 				LogError("Failed to process regulation query via QueryService", ex);
@@ -104,10 +102,9 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 
 			httpResponse.StatusCode = (int)HttpStatusCode.OK;
 			httpResponse.ContentType = ListenerConstants.ResponseTypeUTF8Json;
-			await JsonSerializer.SerializeAsync(httpResponse.OutputStream, failedResponse, serializationOptions).ConfigureAwait(false);
+            await JsonSerializer.SerializeAsync(httpResponse.OutputStream, queryResponse, serializationOptions).ConfigureAwait(false);
 			httpResponse.OutputStream.Close();
-
-			return ReferenceEquals(queryResponse, failedResponse);
+            return true;
 		}
 	}
 }

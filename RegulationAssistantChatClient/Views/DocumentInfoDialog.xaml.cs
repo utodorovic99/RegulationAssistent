@@ -18,7 +18,7 @@ namespace RegulationAssistantChatClient.Views
 			// Default validity period: ValidFrom = now, ValidTo = far future
 			ValidFromPicker.SelectedDate = validFrom ?? DateTime.Now;
 			// Use a very distant year for indefinite validity
-			ValidToPicker.SelectedDate = validTo ?? DateTime.MaxValue;
+			ValidToPicker.SelectedDate = validTo ?? DateTime.Now;
 
 			OkButton.IsEnabled = !string.IsNullOrWhiteSpace(TitleTextBox.Text);
 			TitleTextBox.TextChanged += (s, e) => OkButton.IsEnabled = !string.IsNullOrWhiteSpace(TitleTextBox.Text);
@@ -27,6 +27,7 @@ namespace RegulationAssistantChatClient.Views
 		public string DocumentTitle => TitleTextBox.Text;
 		public DateTime? ValidFrom => ValidFromPicker.SelectedDate;
 		public DateTime? ValidTo => ValidToPicker.SelectedDate;
+		public bool BuildIndex => BuildIndexCheckBox.IsChecked ?? true;
 
 		private void OkButton_Click(object sender, RoutedEventArgs e)
 		{

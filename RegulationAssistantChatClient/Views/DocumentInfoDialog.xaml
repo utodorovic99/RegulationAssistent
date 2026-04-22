@@ -19,17 +19,18 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" Text="Title:" />
+        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" Text="Naslov:" />
         <TextBox x:Name="TitleTextBox" Grid.Row="0" Grid.Column="1" FontSize="14" Padding="6" Margin="0,0,0,12" VerticalContentAlignment="Center"
                  Background="{StaticResource TextBoxBackgroundBrush}" Foreground="{StaticResource TextBoxForegroundBrush}" />
 
-        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" Text="Valid from:" />
+        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" Text="Vazi od:" />
         <DatePicker x:Name="ValidFromPicker" Grid.Row="1" Grid.Column="1" Height="30" Width="200" Margin="0,0,0,12"
                     Foreground="{StaticResource TextBoxForegroundBrush}" Background="{StaticResource BackgroundBrush}" CalendarStyle="{StaticResource DarkCalendarStyle}">
             <DatePicker.Resources>
@@ -46,7 +47,7 @@
             </DatePicker.Resources>
         </DatePicker>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" Text="Valid to:" />
+        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" Text="Vazi do:" />
         <DatePicker x:Name="ValidToPicker" Grid.Row="2" Grid.Column="1" Height="30" Width="200" Margin="0,0,0,12"
                     Foreground="{StaticResource TextBoxForegroundBrush}" Background="{StaticResource BackgroundBrush}" CalendarStyle="{StaticResource DarkCalendarStyle}">
             <DatePicker.Resources>
@@ -63,10 +64,18 @@
             </DatePicker.Resources>
         </DatePicker>
 
-        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,0,0">
-            <Button x:Name="OkButton" Content="Save" Width="80" Height="30" Margin="0,0,10,0" IsDefault="True" Click="OkButton_Click"
+        <CheckBox x:Name="BuildIndexCheckBox"
+                  Grid.Row="3"
+                  Grid.Column="0"
+                  Margin="0,0,0,12"
+                  IsChecked="False"
+                  Content="Indeksriaj"
+                  Foreground="{StaticResource ForegroundBrush}" />
+
+        <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,0,0">
+            <Button x:Name="OkButton" Content="Sacuvaj" Width="80" Height="30" Margin="0,0,10,0" IsDefault="True" Click="OkButton_Click"
                     Background="{StaticResource ButtonBackgroundBrush}" Foreground="{StaticResource ButtonForegroundBrush}" />
-            <Button x:Name="CancelButton" Content="Cancel" Width="80" Height="30" IsCancel="True" Click="CancelButton_Click"
+            <Button x:Name="CancelButton" Content="Otkazi" Width="80" Height="30" IsCancel="True" Click="CancelButton_Click"
                     Background="{StaticResource ButtonBackgroundBrush}" Foreground="{StaticResource ButtonForegroundBrush}" />
         </StackPanel>
     </Grid>

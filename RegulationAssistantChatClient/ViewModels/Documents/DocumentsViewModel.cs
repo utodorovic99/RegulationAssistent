@@ -236,7 +236,7 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 				var request = new DocumentUploadRequest
 				{
 					Title = originalTitle,
-					ValidFrom = DateOnly.FromDateTime(DateTime.Now),
+					ValidFrom = DateTime.Now.Date,
 					FileBytes = fileBytes,
 					Format = DocumentFormat.Docx,
 				};
@@ -541,7 +541,7 @@ namespace RegulationAssistantChatClient.ViewModels.Documents
 				var request = new DocumentUploadRequest
 				{
 					Title = title,
-					ValidFrom = DateOnly.FromDateTime(DateTime.Now),
+					ValidFrom = DateTime.Now.Date,
 					FileBytes = fileBytes
 				};
 

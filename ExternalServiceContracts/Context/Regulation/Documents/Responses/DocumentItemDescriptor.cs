@@ -29,13 +29,13 @@ namespace ExternalServiceContracts.Context.Regulation.Documents.Responses
 		/// Gets or sets date from document is considered as valid.
 		/// </summary>
 		[DataMember]
-		public DateOnly ValidFrom { get; set; }
+		public DateTime ValidFrom { get; set; }
 
 		/// <summary>
 		/// Gets or sets date till document is considered as valid.
 		/// </summary>
 		[DataMember]
-		public DateOnly ValidTo { get; set; }
+		public DateTime ValidTo { get; set; }
 
 		/// <summary>
 		/// Gets or sets document format (e.g., .docx).

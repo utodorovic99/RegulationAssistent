@@ -83,8 +83,9 @@ namespace RegulationAssistantChatClient.Views
 						var request = new DocumentUploadRequest
 						{
 							Title = infoDlg.DocumentTitle,
-							ValidFrom = infoDlg.ValidFrom.HasValue ? DateOnly.FromDateTime(infoDlg.ValidFrom.Value) : DateOnly.FromDateTime(DateTime.Now),
-							ValidTo = infoDlg.ValidTo.HasValue ? DateOnly.FromDateTime(infoDlg.ValidTo.Value) : null,
+							ValidFrom = infoDlg.ValidFrom ?? DateTime.Now.Date,
+							ValidTo = infoDlg.ValidTo,
+							BuildIndex = infoDlg.BuildIndex,
 							FileBytes = bytes
 						};
 
@@ -114,7 +115,7 @@ namespace RegulationAssistantChatClient.Views
 			try
 			{
 				// When editing, show dialog pre-filled with current values
-				var infoDlg = new DocumentInfoDialog(doc.Title, doc.ValidFrom.ToDateTime(TimeOnly.MinValue), doc.ValidTo.ToDateTime(TimeOnly.MinValue));
+				var infoDlg = new DocumentInfoDialog(doc.Title, doc.ValidFrom, doc.ValidTo);
 
 				if (infoDlg.ShowDialog() == true)
 				{
@@ -122,8 +123,9 @@ namespace RegulationAssistantChatClient.Views
 					var request = new DocumentUploadRequest
 					{
 						Title = infoDlg.DocumentTitle,
-						ValidFrom = infoDlg.ValidFrom.HasValue ? DateOnly.FromDateTime(infoDlg.ValidFrom.Value) : doc.ValidFrom,
-						ValidTo = infoDlg.ValidTo.HasValue ? DateOnly.FromDateTime(infoDlg.ValidTo.Value) : doc.ValidTo,
+						ValidFrom = infoDlg.ValidFrom ?? doc.ValidFrom,
+						ValidTo = infoDlg.ValidTo ?? doc.ValidTo,
+						BuildIndex = infoDlg.BuildIndex,
 						FileBytes = Array.Empty<byte>() // No file content change in metadata-only edit
 					};
 
