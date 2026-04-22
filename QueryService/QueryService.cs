@@ -50,7 +50,7 @@ namespace QueryService
 							QuestionEmbedding = createQuestionEmbeddingResponse.Embedding,
 							QuestionContext = request.Context,
 							NumberOfResults = 3,
-							ScoreThreshold = 0.7f,
+							ScoreThreshold = 0.5f,
 						};
 
 						GetRelevantSectionsResponse indexedResultsResponse = await serviceProxyPool.GetProxy<IDocumentIndexReader>().GetIndexedResults(getIndexedResultsRequest).ConfigureAwait(false);
