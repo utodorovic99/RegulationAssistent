@@ -151,7 +151,10 @@ namespace RegulationAssistantChatClient.ViewModels
 				response = RegulationResponse.FailedResponse;
 			}
 
-			ChatMessages.Add(new ChatMessage(response.Answer, false));
+			string uiText = !string.IsNullOrWhiteSpace(response.Answer)
+				? response.Answer
+				: response.ShortAnswer;
+			ChatMessages.Add(new ChatMessage(uiText, false));
 			Question = string.Empty;
 		}
 

@@ -63,7 +63,7 @@ namespace RegulationAssistantChatClient.Services
 				response.EnsureSuccessStatusCode();
 
 				RegulationResponse? deserializedResponse = await response.Content.ReadFromJsonAsync<RegulationResponse>(options);
-				if (!string.IsNullOrWhiteSpace(deserializedResponse?.Answer))
+				if (!string.IsNullOrWhiteSpace(deserializedResponse?.ShortAnswer))
 				{
 					return deserializedResponse;
 				}

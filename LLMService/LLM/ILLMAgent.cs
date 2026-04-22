@@ -7,6 +7,6 @@ namespace ResponseService
 	{
 		Task<float[]> CreateEmbeddingAsync(string text);
 		Task<float[][]> CreateEmbeddingsAsync(string[] texts);
-		Task<string> GenerateResponseAsync(RegulationLLMQuestion request);
+		Task<RegulationResponse> GenerateResponseAsync(RegulationLLMQuestion request);
 	}
 }

@@ -63,7 +63,7 @@ namespace QueryService
 							};
 
 							RegulationResponse llmResponse = await serviceProxyPool.GetProxy<ILLMService>().SubmitRegulationQuestion(llmQuestionRequest);
-							if (llmResponse != null && !string.IsNullOrEmpty(llmResponse.Answer))
+							if (llmResponse != null && !string.IsNullOrEmpty(llmResponse.ShortAnswer))
 							{
 								return llmResponse;
 							}

@@ -6,6 +6,7 @@ namespace ResponseService
 		public string? EmbeddingsModel { get; set; }
 		public string? CompletionsPath { get; set; }
 		public string? CompletionsModel { get; set; }
+		public string? OpenAIApiKey { get; set; }
 
 		public bool IsValid => !string.IsNullOrEmpty(EmbeddingsPath)
 			&& !string.IsNullOrEmpty(EmbeddingsModel);

@@ -10,8 +10,8 @@
   <Section Name="LLMConfig">
   	<Parameter Name="EmbeddingsPath" Value="http://localhost:11434/api/embed" />
   	<Parameter Name="EmbeddingsModel" Value="bge-m3:latest"/>
-  	<!--Leave empty for now-->
-  	<Parameter Name="CompletionsPath" Value="http://localhost:11434/api/chat" />
-  	<Parameter Name="CompletionsModel" Value="llama3" />
+	  	<Parameter Name="CompletionsPath" Value="https://api.groq.com/openai/v1/chat/completions" />
+	  	<Parameter Name="CompletionsModel" Value="llama-3.1-8b-instant" />
+	  	<Parameter Name="APIKey" Value="" />
   </Section>
 </Settings>

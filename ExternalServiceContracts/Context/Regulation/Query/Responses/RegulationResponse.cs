@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using CommonSDK;
+using ExternalServiceContracts.Common;
+using System.Collections.Generic;
 
 namespace ExternalServiceContracts.Responses
 {
@@ -15,12 +17,25 @@ namespace ExternalServiceContracts.Responses
 		public static readonly RegulationResponse FailedResponse = new RegulationResponse
 		{
 			Answer = "System is unable to provide response due to internal failure.",
+			ShortAnswer = "System is unable to provide response due to internal failure.",
+			Explanation = string.Empty,
+			Citations = new List<DocumentCitation>(),
+			Confidence = 0,
 		};
 
-		/// <summary>
-		/// Gets a concise answer to the regulation query. This should provide a brief and direct response to the question asked.
-		/// </summary>
 		[JsonPropertyName("answer")]
 		public string Answer { get; set; } = string.Empty;
+
+		[JsonPropertyName("shortAnswer")]
+		public string ShortAnswer { get; set; } = string.Empty;
+
+		[JsonPropertyName("explanation")]
+		public string Explanation { get; set; } = string.Empty;
+
+		[JsonPropertyName("citations")]
+		public List<DocumentCitation> Citations { get; set; } = new List<DocumentCitation>();
+
+		[JsonPropertyName("confidence")]
+		public float Confidence { get; set; }
 	}
 }

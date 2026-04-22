@@ -72,7 +72,7 @@ namespace LLMService
 
 		public async Task<RegulationResponse> SubmitRegulationQuestion(RegulationLLMQuestion request)
 		{
-			string generatedResponse = string.Empty;
+			RegulationResponse? generatedResponse = null;
 			try
 			{
 				generatedResponse = await llmAgent.GenerateResponseAsync(request).ConfigureAwait(false);
@@ -82,15 +82,12 @@ namespace LLMService
 				ServiceEventSource.Current.ServiceMessage(this.Context, $"LLM translation request failed: {ex.Message}");
 			}
 
-			if (string.IsNullOrEmpty(generatedResponse))
+			if (generatedResponse == null)
 			{
-				generatedResponse = MessageConsts.FailedToCreateResponseErr;
+				generatedResponse = RegulationResponse.FailedResponse;
 			}
 
-			return new RegulationResponse
-			{
-				Answer = generatedResponse,
-			};
+			return generatedResponse;
 		}
 
 		/// <summary>
