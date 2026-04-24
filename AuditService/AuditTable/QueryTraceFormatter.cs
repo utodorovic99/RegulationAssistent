@@ -49,16 +49,18 @@ namespace AuditService.AuditTable
 					sb.AppendLine($"{i++}. {serviceTrace.ServiceName}");
 					sb.AppendLine($"Enter Time: {serviceTrace.EnterTime}");
 					sb.AppendLine($"Exit Time: {serviceTrace.ExitTime}");
+				}
+			}
 
-					if (serviceTrace?.Events?.Count > 0)
-					{
-						sb.AppendLine($"Events:");
+			sb.AppendLine();
 
-						foreach (var serviceEvent in serviceTrace.Events)
-						{
-							sb.AppendLine($"\t- [{serviceEvent.Timestamp}][{serviceEvent.Status}] {serviceEvent.Message}");
-						}
-					}
+			if (queryAudit.Events?.Count > 0)
+			{
+				sb.AppendLine($"Events:");
+
+				foreach (var serviceEvent in queryAudit.Events)
+				{
+					sb.AppendLine($"\t- [{serviceEvent.Timestamp}][{serviceEvent.Service}]({serviceEvent.Status}) {serviceEvent.Message}");
 				}
 			}
 

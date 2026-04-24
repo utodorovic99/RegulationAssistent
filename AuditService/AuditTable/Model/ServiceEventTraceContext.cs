@@ -6,7 +6,10 @@ namespace AuditService.Model
 	public sealed class ServiceEventTraceContext
 	{
 		[DataMember]
-		public DateTimeOffset Timestamp { get; set; }
+		public string Service { get; set; } = string.Empty;
+
+		[DataMember]
+		public DateTime Timestamp { get; set; }
 
 		[DataMember]
 		public string Message { get; set; } = string.Empty;

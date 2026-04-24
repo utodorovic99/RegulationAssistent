@@ -69,12 +69,13 @@ namespace AuditService
 		{
 			var servieEvent = new ServiceEventTraceContext()
 			{
+				Service = serviceFullName,
 				Timestamp = DateTime.Now,
 				Message = message,
 				Status = status,
 			};
 
-			await queryAuditTable.LogServiceEventAsync(requestId, serviceFullName, servieEvent).ConfigureAwait(false);
+			await queryAuditTable.LogServiceEventAsync(requestId, servieEvent).ConfigureAwait(false);
 		}
 
 		public async Task LogServiceExit(long requestId, string serviceFullName)

@@ -10,6 +10,7 @@ namespace AuditService.Model
 		public QueryAudit()
 		{
 			ServiceTracing = new List<ServiceTraceContext>();
+			Events = new List<ServiceEventTraceContext>();
 		}
 
 		[DataMember]
@@ -29,5 +30,8 @@ namespace AuditService.Model
 
 		[DataMember]
 		public List<ServiceTraceContext> ServiceTracing { get; set; } = new List<ServiceTraceContext>(0);
+
+		[DataMember]
+		public List<ServiceEventTraceContext> Events { get; set; }
 	}
 }

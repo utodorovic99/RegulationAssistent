@@ -8,7 +8,7 @@ namespace AuditService
 
 		Task StartServiceTraceAsync(long requestId, ServiceTraceContext serviceTrace);
 
-		Task LogServiceEventAsync(long requestId, string serviceName, ServiceEventTraceContext serviceEvent);
+		Task LogServiceEventAsync(long requestId, ServiceEventTraceContext serviceEvent);
 
 		Task CompleteServiceTraceAsync(long requestId, string serviceName, DateTime timestamp);
 

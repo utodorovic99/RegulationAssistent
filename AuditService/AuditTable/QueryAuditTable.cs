@@ -55,7 +55,7 @@ namespace AuditService
 			}
 		}
 
-		public async Task LogServiceEventAsync(long requestId, string serviceName, ServiceEventTraceContext serviceEvent)
+		public async Task LogServiceEventAsync(long requestId, ServiceEventTraceContext serviceEvent)
 		{
 			var dict = await stateManager.GetOrAddAsync<IReliableDictionary<long, QueryAudit>>(DictionaryName).ConfigureAwait(false);
 			using (var tx = stateManager.CreateTransaction())
@@ -63,12 +63,8 @@ namespace AuditService
 				var result = await dict.TryGetValueAsync(tx, requestId).ConfigureAwait(false);
 				if (result.HasValue)
 				{
-					var serviceTrace = result.Value.ServiceTracing.FirstOrDefault(x => x.ServiceName.Equals(serviceName, StringComparison.InvariantCultureIgnoreCase));
-					if (serviceTrace != null)
-					{
-						serviceTrace.Events.Add(serviceEvent);
-						await tx.CommitAsync().ConfigureAwait(false);
-					}
+					result.Value.Events.Add(serviceEvent);
+					await tx.CommitAsync().ConfigureAwait(false);
 				}
 			}
 		}
