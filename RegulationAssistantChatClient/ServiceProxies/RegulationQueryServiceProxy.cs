@@ -36,19 +36,14 @@ namespace RegulationAssistantChatClient.Services
 		/// <param name="request">The request to send. The method serializes this object to JSON.</param>
 		/// <returns>
 		/// The deserialized <see cref="RegulationResponse"/> when the call succeeds; otherwise
-		/// a cached failure response (<see cref="FailedResponsesCached.FailedRegulationQueryResponse"/>)
+		/// a cached failure response.
 		/// when an error occurs.
 		/// </returns>
-		/// <remarks>
-		/// The method performs a POST to the configured service base URL using the path "Submit".
-		/// Any exception during sending or deserialization is caught and results in returning the
-		/// predefined failed response. Callers should treat the returned value accordingly.
-		/// </remarks>
 		public async Task<RegulationResponse> SendRegulationQueryAsync(RegulationQueryRequest request)
 		{
 			if (request == null)
 			{
-				return RegulationResponse.FailedResponse;
+				return RegulationResponse.CreateFailedResponse(0);
 			}
 
 			try
@@ -72,7 +67,7 @@ namespace RegulationAssistantChatClient.Services
 			{
 			}
 
-			return RegulationResponse.FailedResponse;
+			return RegulationResponse.CreateFailedResponse(0);
 		}
 	}
 }

@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\APIGatewayService\APIGatewayService.csproj" />
+    <ProjectReference Include="..\AuditService\AuditService.csproj" />
     <ProjectReference Include="..\DocumentIndexingService\DocumentIndexingService.csproj" />
     <ProjectReference Include="..\DocumentStorageService\DocumentStorageService.csproj" />
     <ProjectReference Include="..\LLMService\LLMService.csproj" />

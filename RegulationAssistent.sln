@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueryService", "QueryServic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LLMService", "LLMService\LLMService.csproj", "{E9B6464B-A145-4FA7-96FC-027EBBE9F8A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditService", "AuditService\AuditService.csproj", "{9BD6B934-0A59-4E57-B100-4DDF8A49CCB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,14 @@ Global
 		{E9B6464B-A145-4FA7-96FC-027EBBE9F8A1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E9B6464B-A145-4FA7-96FC-027EBBE9F8A1}.Release|x64.ActiveCfg = Release|Any CPU
 		{E9B6464B-A145-4FA7-96FC-027EBBE9F8A1}.Release|x64.Build.0 = Release|Any CPU
+		{9BD6B934-0A59-4E57-B100-4DDF8A49CCB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BD6B934-0A59-4E57-B100-4DDF8A49CCB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BD6B934-0A59-4E57-B100-4DDF8A49CCB4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9BD6B934-0A59-4E57-B100-4DDF8A49CCB4}.Debug|x64.Build.0 = Debug|Any CPU
+		{9BD6B934-0A59-4E57-B100-4DDF8A49CCB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BD6B934-0A59-4E57-B100-4DDF8A49CCB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BD6B934-0A59-4E57-B100-4DDF8A49CCB4}.Release|x64.ActiveCfg = Release|Any CPU
+		{9BD6B934-0A59-4E57-B100-4DDF8A49CCB4}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

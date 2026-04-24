@@ -68,6 +68,7 @@
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
 
 			<TextBlock Grid.Row="0" Grid.Column="0" Text='{x:Static res:Resources.DateLabel}' Foreground="{StaticResource ForegroundBrush}" Margin="0,0,6,4" VerticalAlignment="Bottom" />
@@ -93,6 +94,7 @@
 
 			<Button Grid.Row="1" Grid.Column="2" Command="{Binding SendCommand}" Width="100" VerticalAlignment="Center" Height="40" Content="{x:Static res:Resources.SendButton}" />
 			<Button Grid.Row="1" Grid.Column="3" Command="{Binding ClearChatCommand}" Width="100" VerticalAlignment="Center" Height="40" Margin="10,0,0,0" Content="{x:Static res:Resources.ClearButton}" />
+			<Button Grid.Row="1" Grid.Column="4" Command="{Binding TraceLastRequestCommand}" Width="100" VerticalAlignment="Center" Height="40" Margin="10,0,0,0" Content="{x:Static res:Resources.TraceButton}"/>
 		</Grid>
 	</Grid>
 </UserControl>

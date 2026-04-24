@@ -18,8 +18,6 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 	/// </summary>
 	internal sealed class RegulationQueryHttpRequestProcessor : BaseHttpRequestProcessor
 	{
-		private static readonly string failedResponse = "Server was unable to provide response.";
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RegulationQueryHttpRequestProcessor"/> class with the specified service context and a default request validator.
 		/// </summary>
@@ -85,11 +83,11 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 			RegulationQueryRequest deserializedRequestCasted = (RegulationQueryRequest)deserializedRequest;
 			RegulationResponse queryResponse = null;
 
-            try
-            {
-                queryResponse = await serviceProxyPool.GetProxy<IRegulationQuery>()
-                    .SubmitQuestion(deserializedRequestCasted).ConfigureAwait(false);
-            }
+			try
+			{
+				queryResponse = await serviceProxyPool.GetProxy<IRegulationQuery>()
+					.SubmitQuestion(deserializedRequestCasted).ConfigureAwait(false);
+			}
 			catch (Exception ex)
 			{
 				LogError("Failed to process regulation query via QueryService", ex);
@@ -97,14 +95,14 @@ namespace APIGatewayService.Context.Regulation.RegulationQuery.Requests
 
 			if (queryResponse == null)
 			{
-				queryResponse = RegulationResponse.FailedResponse;
+				queryResponse = RegulationResponse.CreateFailedResponse(0);
 			}
 
 			httpResponse.StatusCode = (int)HttpStatusCode.OK;
 			httpResponse.ContentType = ListenerConstants.ResponseTypeUTF8Json;
-            await JsonSerializer.SerializeAsync(httpResponse.OutputStream, queryResponse, serializationOptions).ConfigureAwait(false);
+			await JsonSerializer.SerializeAsync(httpResponse.OutputStream, queryResponse, serializationOptions).ConfigureAwait(false);
 			httpResponse.OutputStream.Close();
-            return true;
+			return true;
 		}
 	}
 }

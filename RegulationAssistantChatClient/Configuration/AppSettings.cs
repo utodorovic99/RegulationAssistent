@@ -11,12 +11,18 @@ namespace RegulationAssistantChatClient.Configuration
 		/// Base URL of the Regulation Query service used by the chat client. Defaults to
 		/// "http://localhost:8080/RegulationQuery" when not provided in configuration.
 		/// </summary>
-		public string RegulationQueryServiceBaseUrl { get; init; } = "http://localhost:8080/RegulationQuery";
+		public string RegulationQueryServiceBaseUrl { get; set; } = "http://localhost:8080/RegulationQuery";
 
 		/// <summary>
 		/// Base URL of the Document Storage service used by the chat client. Defaults to
 		/// "http://localhost:8080/Documents" when not provided in configuration.
 		/// </summary>
-		public string DocumentStorageServiceBaseUrl { get; init; } = "http://localhost:8080/Documents";
+		public string DocumentStorageServiceBaseUrl { get; set; } = "http://localhost:8080/Documents";
+
+		/// <summary>
+		/// Base URL of the auditing service used by the chat client. Defaults to
+		/// "http://localhost:8080/Tracing"" when not provided in configuration.
+		/// </summary>
+		public string AuditingServiceBaseUrl { get; set; } = "http://localhost:8080/Auditing";
 	}
 }

@@ -26,12 +26,22 @@ namespace DocumentIndexingService
 		public DocumentIndexingService(StatefulServiceContext context) : base(context)
 		{
 			serviceProxyPool = new RpServiceProxyPool();
+			serviceProxyPool.RegisterFabricRP2Proxy<IAuditService>("fabric:/RegulationAssistent/AuditService", ServiceType.Stateful);
 			serviceProxyPool.RegisterFabricRP2Proxy<ILLMService>("fabric:/RegulationAssistent/LLMService", ServiceType.Stateful);
 
 			documentParsers = new Dictionary<CommonSDK.DocumentFormat, IDocumentParser>(1);
 			documentParsers.Add(CommonSDK.DocumentFormat.Docx, new WordDocumentParser());
 
 			embeddingDb = new QdrantEmbeddingDb();
+		}
+
+		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
+		{
+			return new ServiceReplicaListener[1]
+			{
+				new ServiceReplicaListener(ctx =>
+					new FabricTransportServiceRemotingListener(ctx, this), "V2_1Listener")
+			};
 		}
 
 		public async Task<bool> BuildDocumentIndex(BuildDocumentIndexRequest request)
@@ -184,29 +194,32 @@ namespace DocumentIndexingService
 
 		public async Task<GetRelevantSectionsResponse> GetIndexedResults(GetRelevantSectionsRequest request)
 		{
-			if (request == null)
-			{
-				return GetRelevantSectionsResponse.EmptyResponse;
-			}
+			string inProgressOperation = string.Empty;
+			string serviceName = nameof(DocumentIndexingService);
+			long requestId = request.RequestId;
+
+			var auditServiceProxy = serviceProxyPool.GetProxy<IAuditService>();
+			await auditServiceProxy.LogServiceEnter(requestId, serviceName);
 
 			try
 			{
-				return await embeddingDb.GetIndexedResults(request).ConfigureAwait(false);
+				inProgressOperation = "Embeddings search";
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Started");
+				var response = await embeddingDb.GetIndexedResults(request).ConfigureAwait(false);
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Completed");
+
+				response.RequestId = request.RequestId;
+				return response;
 			}
 			catch (Exception e)
 			{
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"Failed to retrieve indexed results from Qdrant for document: {e.Message}");
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, $"{inProgressOperation} failed with: {e}", "Failed");
 				return GetRelevantSectionsResponse.EmptyResponse;
 			}
-		}
-
-		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
-		{
-			return new ServiceReplicaListener[1]
+			finally
 			{
-				new ServiceReplicaListener(ctx =>
-					new FabricTransportServiceRemotingListener(ctx, this), "V2_1Listener")
-			};
+				await auditServiceProxy.LogServiceExit(requestId, serviceName);
+			}
 		}
 	}
 }

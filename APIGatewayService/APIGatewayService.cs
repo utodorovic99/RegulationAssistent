@@ -29,6 +29,7 @@ namespace APIGatewayService
 
 		protected override Task RunAsync(CancellationToken cancellationToken)
 		{
+			serviceProxyPool.RegisterFabricRP2Proxy<IAuditService>("fabric:/RegulationAssistent/AuditService", ServiceType.Stateful);
 			serviceProxyPool.RegisterFabricRP2Proxy<IDocumentStorageService>("fabric:/RegulationAssistent/DocumentStorageService", ServiceType.Stateful);
 			serviceProxyPool.RegisterFabricRP2Proxy<IRegulationQuery>("fabric:/RegulationAssistent/QueryService", ServiceType.Stateless);
 
@@ -50,6 +51,7 @@ namespace APIGatewayService
 						requestProcessors: new IHttpRequestProcessor[]
 						{
 							new RegulationQueryHttpRequestProcessor(serviceContext, serviceProxyPool),
+							new AuditHttpRequestProcessor(serviceContext, serviceProxyPool),
 							new DocumentUploadHttpRequestProcessor(serviceContext, serviceProxyPool),
 							new GetDocumentsHttpRequestProcessor(serviceContext, serviceProxyPool),
 							new GetDocumentHttpRequestProcessor(serviceContext, serviceProxyPool),

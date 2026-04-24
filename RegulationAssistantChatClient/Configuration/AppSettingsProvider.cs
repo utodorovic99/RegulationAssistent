@@ -45,14 +45,13 @@ namespace RegulationAssistantChatClient.Configuration
 				string json = File.ReadAllText(configPath);
 				using JsonDocument doc = JsonDocument.Parse(json);
 
-				string? regulationQueryUrl = null;
-				string? documentStorageUrl = null;
+				AppSettings settings = new AppSettings();
 
 				if (doc.RootElement.TryGetProperty("RegulationQueryService", out JsonElement regulationQuerySection))
 				{
 					if (regulationQuerySection.TryGetProperty("BaseUrl", out JsonElement urlElem) && urlElem.ValueKind == JsonValueKind.String)
 					{
-						regulationQueryUrl = urlElem.GetString();
+						settings.RegulationQueryServiceBaseUrl = urlElem.GetString();
 					}
 				}
 
@@ -60,15 +59,19 @@ namespace RegulationAssistantChatClient.Configuration
 				{
 					if (documentStorageSection.TryGetProperty("BaseUrl", out JsonElement urlElem) && urlElem.ValueKind == JsonValueKind.String)
 					{
-						documentStorageUrl = urlElem.GetString();
+						settings.DocumentStorageServiceBaseUrl = urlElem.GetString();
 					}
 				}
 
-				return new AppSettings
+				if (doc.RootElement.TryGetProperty("AuditingServiceBaseUrl", out JsonElement auditingSection))
 				{
-					RegulationQueryServiceBaseUrl = regulationQueryUrl ?? "http://localhost:8080/RegulationQuery",
-					DocumentStorageServiceBaseUrl = documentStorageUrl ?? "http://localhost:8080/Documents"
-				};
+					if (auditingSection.TryGetProperty("BaseUrl", out JsonElement urlElem) && urlElem.ValueKind == JsonValueKind.String)
+					{
+						settings.AuditingServiceBaseUrl = urlElem.GetString();
+					}
+				}
+
+				return settings;
 			}
 			catch
 			{

@@ -66,6 +66,11 @@ namespace RegulationAssistantChatClient.Properties
 		public static string ClearButton => ResourceManager.GetString("ClearButton", resourceCulture);
 
 		/// <summary>
+		/// Gets the localized value for the "TraceButton" resource key.
+		/// </summary>
+		public static string TraceButton => ResourceManager.GetString("TraceButton", resourceCulture);
+
+		/// <summary>
 		/// Gets the localized value for the "DateLabel" resource key.
 		/// </summary>
 		public static string DateLabel => ResourceManager.GetString("DateLabel", resourceCulture);

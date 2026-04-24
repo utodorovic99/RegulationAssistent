@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using CommonSDK;
 using ExternalServiceContracts.Context.Regulation.Embeddings;
@@ -6,7 +7,7 @@ using ExternalServiceContracts.Context.Regulation.Embeddings;
 namespace ExternalServiceContracts.Requests
 {
 	[DataContract]
-	public sealed class RegulationLLMQuestion : IJsonSerializableRequest
+	public sealed class RegulationLLMQuestion : AudibleMessage, IJsonSerializableRequest
 	{
 		[DataMember]
 		public string Question { get; set; } = default!;

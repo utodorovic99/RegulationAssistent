@@ -8,7 +8,7 @@ namespace ExternalServiceContracts.Requests
 	/// Represents a user question or query that needs to be evaluated against regulation logic.
 	/// </summary>
 	[DataContract]
-	public sealed class RegulationQueryRequest : IJsonSerializableRequest
+	public sealed class RegulationQueryRequest : AudibleMessage, IJsonSerializableRequest
 	{
 		/// <summary>
 		/// Gets or sets the textual question to evaluate against regulation rules.
@@ -23,15 +23,5 @@ namespace ExternalServiceContracts.Requests
 		[DataMember]
 		[JsonPropertyName("context")]
 		public RegulationQueryContext Context { get; set; } = default!;
-
-		/// <summary>
-		/// Performs lightweight validation of the request.
-		/// </summary>
-		public bool IsValid()
-		{
-			return !string.IsNullOrWhiteSpace(Question)
-				&& Context != null
-				&& Context.IsValid();
-		}
 	}
 }

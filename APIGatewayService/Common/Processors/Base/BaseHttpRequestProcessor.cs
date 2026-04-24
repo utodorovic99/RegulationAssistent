@@ -19,6 +19,8 @@ namespace APIGatewayService.Common.Processors
 	/// </summary>
 	internal abstract class BaseHttpRequestProcessor : IHttpRequestProcessor
 	{
+		protected static readonly string failedResponse = "Server was unable to provide response.";
+
 		protected readonly string httpPrefix;
 		protected readonly string triggerPath;
 		protected readonly string triggerHttpMethod;
@@ -125,7 +127,8 @@ namespace APIGatewayService.Common.Processors
 					errMessage: $"invalid_json: {ex.Message}");
 			}
 
-			if (!requestValidator.TryValidateRequest(deserializedRequest, out string validationError))
+			if (requestValidator != null
+				&& !requestValidator.TryValidateRequest(deserializedRequest, out string validationError))
 			{
 				LogError("Validation failed for the request", new InvalidOperationException(validationError));
 

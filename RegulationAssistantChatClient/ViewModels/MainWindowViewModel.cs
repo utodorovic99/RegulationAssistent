@@ -84,6 +84,17 @@ namespace RegulationAssistantChatClient.ViewModels
 		}
 
 		/// <summary>
+		/// Gets the command that traces last request. This is forwarded from <see cref="ChatViewModel"/>.
+		/// </summary>
+		public ICommand TraceLastRequestCommand
+		{
+			get
+			{
+				return ChatViewModel.TraceLastRequestCommand;
+			}
+		}
+
+		/// <summary>
 		/// Gets or sets the selected date used for regulation queries. This is forwarded to the <see cref="ChatViewModel"/>.
 		/// </summary>
 		public DateTime? SelectedDate

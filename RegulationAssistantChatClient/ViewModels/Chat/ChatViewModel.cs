@@ -16,7 +16,8 @@ namespace RegulationAssistantChatClient.ViewModels
 	/// </summary>
 	public class ChatViewModel : INotifyPropertyChanged
 	{
-		private readonly RegulationQueryServiceProxy serviceProxy;
+		private readonly RegulationQueryServiceProxy queryServiceProxy;
+		private readonly AuditingServiceProxy auditServiceProxy;
 		private DateTime? selectedDate = DateTime.Now.Date;
 		private string question = string.Empty;
 
@@ -25,12 +26,14 @@ namespace RegulationAssistantChatClient.ViewModels
 		/// </summary>
 		public ChatViewModel()
 		{
-			serviceProxy = new RegulationQueryServiceProxy(new System.Net.Http.HttpClient());
+			queryServiceProxy = new RegulationQueryServiceProxy(new System.Net.Http.HttpClient());
+			auditServiceProxy = new AuditingServiceProxy(new System.Net.Http.HttpClient());
+
 			SendCommand = new RelayCommand(async () => await SendQueryAsync(), CanSendQuery);
 			ClearChatCommand = new RelayCommand(ClearChat);
+			TraceLastRequestCommand = new RelayCommand(async () => await TraceLastRequestAsync());
 
 			SelectedDate = DateTime.Now.Date;
-
 			ChatMessages = new ObservableCollection<ChatMessage>
 			{
 				CreateWelcomeMessage(),
@@ -93,15 +96,9 @@ namespace RegulationAssistantChatClient.ViewModels
 		public ICommand ClearChatCommand { get; }
 
 		/// <summary>
-		/// Gets
-		/// lLocalized label for the Send button.
+		/// Gets command bound to the Trace lst request button. Traces the last request when executed.
 		/// </summary>
-		public string SendButtonLabel => "Posalji";
-
-		/// <summary>
-		/// Gets localized label for the Clear Chat button.
-		/// </summary>
-		public string ClearButtonLabel => "Ocisti";
+		public ICommand TraceLastRequestCommand { get; }
 
 		/// <summary>
 		/// Property changed notification helper. Raises the PropertyChanged event for the specified property name. When called without arguments, it uses the caller member name as the property name.
@@ -144,11 +141,11 @@ namespace RegulationAssistantChatClient.ViewModels
 			RegulationResponse response;
 			try
 			{
-				response = await serviceProxy.SendRegulationQueryAsync(request);
+				response = await queryServiceProxy.SendRegulationQueryAsync(request);
 			}
 			catch
 			{
-				response = RegulationResponse.FailedResponse;
+				response = RegulationResponse.CreateFailedResponse(0);
 			}
 
 			string uiText = !string.IsNullOrWhiteSpace(response.Answer)
@@ -156,6 +153,25 @@ namespace RegulationAssistantChatClient.ViewModels
 				: response.ShortAnswer;
 			ChatMessages.Add(new ChatMessage(uiText, false));
 			Question = string.Empty;
+		}
+
+		/// <summary>
+		/// Sends trace request to the Regulation Query service and appends the resulting response
+		/// to the chat message collection.
+		/// </summary>
+		private async Task TraceLastRequestAsync()
+		{
+			try
+			{
+				RegulationQueryTraceResponse response = await auditServiceProxy.TraceLastRegulationQueryAsync();
+				if (response?.Trace != null)
+				{
+					ChatMessages.Add(new ChatMessage(response?.Trace, false));
+				}
+			}
+			catch
+			{
+			}
 		}
 
 		/// <summary>

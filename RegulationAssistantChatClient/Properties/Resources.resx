@@ -186,4 +186,7 @@
   <data name="SaveChanges_Title" xml:space="preserve">
     <value>Sacuvaj izmene</value>
   </data>
+  <data name="TraceButton" xml:space="preserve">
+    <value>Loguj</value>
+  </data>
 </root>

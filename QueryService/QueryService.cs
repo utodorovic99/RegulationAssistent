@@ -19,6 +19,7 @@ namespace QueryService
 				: base(context)
 		{
 			serviceProxyPool = new RpServiceProxyPool();
+			serviceProxyPool.RegisterFabricRP2Proxy<IAuditService>("fabric:/RegulationAssistent/AuditService", ServiceType.Stateful);
 			serviceProxyPool.RegisterFabricRP2Proxy<IDocumentIndexReader>("fabric:/RegulationAssistent/DocumentIndexingService", ServiceType.Stateful);
 			serviceProxyPool.RegisterFabricRP2Proxy<ILLMService>("fabric:/RegulationAssistent/LLMService", ServiceType.Stateful);
 		}
@@ -27,58 +28,92 @@ namespace QueryService
 		{
 			return new ServiceInstanceListener[1]
 			{
-				new ServiceInstanceListener(ctx => new FabricTransportServiceRemotingListener(ctx, this), "V2_1Listener")
+				new ServiceInstanceListener(ctx =>
+					new FabricTransportServiceRemotingListener(ctx, this), "V2_1Listener")
 			};
 		}
 
 		public async Task<RegulationResponse> SubmitQuestion(RegulationQueryRequest request)
 		{
-			ArgumentNullException.ThrowIfNull(request);
+			string inProgressOperation = string.Empty;
+			string serviceName = nameof(QueryService);
 
-			if (request != null)
+			var auditServiceProxy = serviceProxyPool.GetProxy<IAuditService>();
+			long requestId = await auditServiceProxy.LogRegulationQueryRequestReceived(request.Question, request.Context);
+			await auditServiceProxy.LogServiceEnter(requestId, serviceName);
+
+			try
 			{
-				try
+				CreateEmbeddingRequest createQuestionEmbeddingRequest = new CreateEmbeddingRequest
 				{
-					var createQuestionEmbeddingRequest = new CreateEmbeddingRequest { Text = request.Question };
-					CreateEmbeddingResponse createQuestionEmbeddingResponse = await serviceProxyPool.GetProxy<ILLMService>()
-						.CreateEmbedding(createQuestionEmbeddingRequest).ConfigureAwait(false);
+					RequestId = requestId,
+					Text = request.Question,
+				};
 
-					if (createQuestionEmbeddingResponse?.Embedding != null)
+				inProgressOperation = "Request Embedding Creation";
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Started");
+				CreateEmbeddingResponse createQuestionEmbeddingResponse = await serviceProxyPool.GetProxy<ILLMService>().CreateEmbedding(createQuestionEmbeddingRequest).ConfigureAwait(false);
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Completed");
+
+				GetRelevantSectionsRequest getIndexedResultsRequest = new GetRelevantSectionsRequest()
+				{
+					RequestId = requestId,
+					QuestionEmbedding = createQuestionEmbeddingResponse.Embedding,
+					QuestionContext = request.Context,
+					NumberOfResults = 3,
+					ScoreThreshold = 0.5f,
+				};
+
+				inProgressOperation = "Search Index";
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Started");
+				GetRelevantSectionsResponse indexedResultsResponse = await serviceProxyPool.GetProxy<IDocumentIndexReader>().GetIndexedResults(getIndexedResultsRequest).ConfigureAwait(false);
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Completed");
+
+				AudibleRegulationLLMQuestion audibleRequest = new AudibleRegulationLLMQuestion
+				{
+					RequestId = requestId,
+					Question = new RegulationLLMQuestion
 					{
-						GetRelevantSectionsRequest getIndexedResultsRequest = new GetRelevantSectionsRequest()
-						{
-							QuestionEmbedding = createQuestionEmbeddingResponse.Embedding,
-							QuestionContext = request.Context,
-							NumberOfResults = 3,
-							ScoreThreshold = 0.5f,
-						};
+						RequestId = requestId,
+						Question = request.Question,
+						RelevantSections = indexedResultsResponse.RelevantSections,
+					},
+				};
 
-						GetRelevantSectionsResponse indexedResultsResponse = await serviceProxyPool.GetProxy<IDocumentIndexReader>().GetIndexedResults(getIndexedResultsRequest).ConfigureAwait(false);
-						if (indexedResultsResponse?.RelevantSections != null)
-						{
-							RegulationLLMQuestion llmQuestionRequest = new RegulationLLMQuestion()
-							{
-								Question = request.Question,
-								RelevantSections = indexedResultsResponse.RelevantSections,
-							};
+				inProgressOperation = "Generate Response";
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Started");
+				RegulationResponse llmResponse = await serviceProxyPool.GetProxy<ILLMService>().SubmitRegulationQuestion(audibleRequest.Question).ConfigureAwait(false);
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Completed");
 
-							RegulationResponse llmResponse = await serviceProxyPool.GetProxy<ILLMService>().SubmitRegulationQuestion(llmQuestionRequest);
-							if (llmResponse != null && !string.IsNullOrEmpty(llmResponse.ShortAnswer))
-							{
-								return llmResponse;
-							}
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					ServiceEventSource.Current.ServiceMessage(this.Context, $"SubmitQuestion on response service failed with exception: {e}");
-				}
+				await auditServiceProxy.LogRegulationQueryResponseReceived(requestId, serviceName, llmResponse.ShortAnswer, ResolveStatus(llmResponse), llmResponse.Confidence);
+				return llmResponse;
+			}
+			catch (Exception e)
+			{
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, $"{inProgressOperation} failed with: {e}", "Failed");
+				return RegulationResponse.CreateFailedResponse(requestId);
+			}
+			finally
+			{
+				await auditServiceProxy.LogServiceExit(requestId, serviceName);
+			}
+		}
+
+		private static ResponseStatus ResolveStatus(RegulationResponse response)
+		{
+			if (response == null || string.IsNullOrWhiteSpace(response.ShortAnswer))
+			{
+				return ResponseStatus.Error;
 			}
 
-			ServiceEventSource.Current.ServiceMessage(this.Context, $"SubmitQuestion on response service failed");
+			if (response.Confidence <= 0)
+			{
+				return ResponseStatus.InsufficientData;
+			}
 
-			return RegulationResponse.FailedResponse;
+			return response.Confidence < 0.5f
+				? ResponseStatus.Partial
+				: ResponseStatus.Successful;
 		}
 	}
 }

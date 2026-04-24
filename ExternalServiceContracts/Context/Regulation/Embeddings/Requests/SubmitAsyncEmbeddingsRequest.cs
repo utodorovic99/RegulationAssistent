@@ -1,11 +1,12 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using CommonSDK;
+using ExternalServiceContracts.Requests;
 
 namespace ExternalServiceContracts.Context.Regulation.Embeddings.Requests
 {
 	[DataContract]
-	public sealed class SubmitAsyncEmbeddingsRequest : IJsonSerializableResponse
+	public sealed class SubmitAsyncEmbeddingsRequest : AudibleMessage, IJsonSerializableResponse
 	{
 		[JsonPropertyName("ids")]
 		[DataMember]

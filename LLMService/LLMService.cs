@@ -26,68 +26,12 @@ namespace LLMService
 			: base(context)
 		{
 			serviceProxyPool = new RpServiceProxyPool();
+			serviceProxyPool.RegisterFabricRP2Proxy<IAuditService>("fabric:/RegulationAssistent/AuditService", ServiceType.Stateful);
 			serviceProxyPool.RegisterFabricRP2Proxy<IEmbeddingAsyncHandler>("fabric:/RegulationAssistent/DocumentIndexingService", ServiceType.Stateful);
 
 			llmAgent = new LLMAgent(context.CodePackageActivationContext);
 			embeddingPublisher = new AsyncEmbeddingPublisher(serviceProxyPool);
 			embeddingCreator = new AsyncEmbeddingCreator(base.StateManager, embeddingPublisher, llmAgent);
-		}
-
-		public async Task<CreateEmbeddingResponse> CreateEmbedding(CreateEmbeddingRequest request)
-		{
-			if (request == null || string.IsNullOrEmpty(request.Text))
-			{
-				return new CreateEmbeddingResponse { Embedding = System.Array.Empty<float>() };
-			}
-
-			try
-			{
-				var embedding = await llmAgent.CreateEmbeddingAsync(request.Text).ConfigureAwait(false);
-				return new CreateEmbeddingResponse { Embedding = embedding };
-			}
-			catch (Exception ex)
-			{
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"CreateEmbedding failed: {ex.Message}");
-				return new CreateEmbeddingResponse { Embedding = System.Array.Empty<float>() };
-			}
-		}
-
-		public async Task<bool> SubmitEmbeddingCreationBulkRequest(AsyncEmbeddingCreationRequest request)
-		{
-			if (request?.Texts?.Length > 0)
-			{
-				try
-				{
-					await embeddingCreator.ProcessAsync(request).ConfigureAwait(false);
-					return true;
-				}
-				catch (Exception ex)
-				{
-					ServiceEventSource.Current.ServiceMessage(this.Context, $"CreateEmbeddingsInBulk failed: {ex.Message}");
-				}
-			}
-
-			return false;
-		}
-
-		public async Task<RegulationResponse> SubmitRegulationQuestion(RegulationLLMQuestion request)
-		{
-			RegulationResponse? generatedResponse = null;
-			try
-			{
-				generatedResponse = await llmAgent.GenerateResponseAsync(request).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"LLM translation request failed: {ex.Message}");
-			}
-
-			if (generatedResponse == null)
-			{
-				generatedResponse = RegulationResponse.FailedResponse;
-			}
-
-			return generatedResponse;
 		}
 
 		/// <summary>
@@ -101,8 +45,96 @@ namespace LLMService
 		{
 			return new ServiceReplicaListener[1]
 			{
-				new ServiceReplicaListener(ctx => new FabricTransportServiceRemotingListener(ctx, this), "V2_1Listener")
+				new ServiceReplicaListener(ctx =>
+					new FabricTransportServiceRemotingListener(ctx, this), "V2_1Listener")
 			};
+		}
+
+		public async Task<CreateEmbeddingResponse> CreateEmbedding(CreateEmbeddingRequest request)
+		{
+			string inProgressOperation = string.Empty;
+			string serviceName = nameof(LLMService);
+			long requestId = request.RequestId;
+
+			var auditServiceProxy = serviceProxyPool.GetProxy<IAuditService>();
+			await auditServiceProxy.LogServiceEnter(requestId, serviceName);
+
+			try
+			{
+				inProgressOperation = "LLM single embedding creation";
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Started");
+				var embedding = await llmAgent.CreateEmbeddingAsync(request.Text).ConfigureAwait(false);
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Completed");
+
+				return new CreateEmbeddingResponse { RequestId = request.RequestId, Embedding = embedding };
+			}
+			catch (Exception e)
+			{
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, $"{inProgressOperation} failed with: {e}", "Failed");
+				return new CreateEmbeddingResponse { RequestId = requestId, Embedding = Array.Empty<float>(), };
+			}
+			finally
+			{
+				await auditServiceProxy.LogServiceExit(requestId, serviceName);
+			}
+		}
+
+		public async Task<bool> SubmitEmbeddingCreationBulkRequest(AsyncEmbeddingCreationRequest request)
+		{
+			string inProgressOperation = string.Empty;
+			string serviceName = nameof(LLMService);
+			long requestId = request.RequestId;
+
+			var auditServiceProxy = serviceProxyPool.GetProxy<IAuditService>();
+			await auditServiceProxy.LogServiceEnter(requestId, serviceName);
+
+			try
+			{
+				inProgressOperation = "LLM bulk embedding creation";
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Started");
+				await embeddingCreator.ProcessAsync(request).ConfigureAwait(false);
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Completed");
+
+				return true;
+			}
+			catch (Exception e)
+			{
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, $"{inProgressOperation} failed with: {e}", "Failed");
+				return false;
+			}
+			finally
+			{
+				await auditServiceProxy.LogServiceExit(requestId, serviceName);
+			}
+		}
+
+		public async Task<RegulationResponse> SubmitRegulationQuestion(RegulationLLMQuestion request)
+		{
+			string inProgressOperation = string.Empty;
+			string serviceName = nameof(LLMService);
+			long requestId = request.RequestId;
+
+			var auditServiceProxy = serviceProxyPool.GetProxy<IAuditService>();
+			await auditServiceProxy.LogServiceEnter(requestId, serviceName);
+
+			try
+			{
+				inProgressOperation = "LLM response creation";
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Started");
+				RegulationResponse generatedResponse = await llmAgent.GenerateResponseAsync(request).ConfigureAwait(false);
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, inProgressOperation, "Completed");
+
+				return generatedResponse;
+			}
+			catch (Exception e)
+			{
+				await auditServiceProxy.LogServiceEvent(requestId, serviceName, $"{inProgressOperation} failed with: {e}", "Failed");
+				return RegulationResponse.CreateFailedResponse(requestId);
+			}
+			finally
+			{
+				await auditServiceProxy.LogServiceExit(requestId, serviceName);
+			}
 		}
 	}
 }
